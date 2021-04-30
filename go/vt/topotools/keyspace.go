@@ -55,6 +55,7 @@ func RefreshTabletsByShard(ctx context.Context, ts *topo.Server, tmc tmclient.Ta
 		m  sync.Mutex
 		wg sync.WaitGroup
 	)
+
 	for _, ti := range tabletMap {
 		if ti.Hostname == "" {
 			// The tablet is not running, we don't have the host
