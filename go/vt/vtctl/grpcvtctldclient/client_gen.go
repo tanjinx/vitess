@@ -82,6 +82,24 @@ func (client *gRPCVtctldClient) CreateShard(ctx context.Context, in *vtctldatapb
 	return client.c.CreateShard(ctx, in, opts...)
 }
 
+// DeleteCellInfo is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) DeleteCellInfo(ctx context.Context, in *vtctldatapb.DeleteCellInfoRequest, opts ...grpc.CallOption) (*vtctldatapb.DeleteCellInfoResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.DeleteCellInfo(ctx, in, opts...)
+}
+
+// DeleteCellsAlias is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) DeleteCellsAlias(ctx context.Context, in *vtctldatapb.DeleteCellsAliasRequest, opts ...grpc.CallOption) (*vtctldatapb.DeleteCellsAliasResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.DeleteCellsAlias(ctx, in, opts...)
+}
+
 // DeleteKeyspace is part of the vtctlservicepb.VtctldClient interface.
 func (client *gRPCVtctldClient) DeleteKeyspace(ctx context.Context, in *vtctldatapb.DeleteKeyspaceRequest, opts ...grpc.CallOption) (*vtctldatapb.DeleteKeyspaceResponse, error) {
 	if client.c == nil {
@@ -341,4 +359,22 @@ func (client *gRPCVtctldClient) TabletExternallyReparented(ctx context.Context, 
 	}
 
 	return client.c.TabletExternallyReparented(ctx, in, opts...)
+}
+
+// UpdateCellInfo is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) UpdateCellInfo(ctx context.Context, in *vtctldatapb.UpdateCellInfoRequest, opts ...grpc.CallOption) (*vtctldatapb.UpdateCellInfoResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.UpdateCellInfo(ctx, in, opts...)
+}
+
+// UpdateCellsAlias is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) UpdateCellsAlias(ctx context.Context, in *vtctldatapb.UpdateCellsAliasRequest, opts ...grpc.CallOption) (*vtctldatapb.UpdateCellsAliasResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.UpdateCellsAlias(ctx, in, opts...)
 }
