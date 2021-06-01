@@ -28,6 +28,33 @@ import (
 	vtctldatapb "vitess.io/vitess/go/vt/proto/vtctldata"
 )
 
+// AddCellInfo is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) AddCellInfo(ctx context.Context, in *vtctldatapb.AddCellInfoRequest, opts ...grpc.CallOption) (*vtctldatapb.AddCellInfoResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.AddCellInfo(ctx, in, opts...)
+}
+
+// AddCellsAlias is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) AddCellsAlias(ctx context.Context, in *vtctldatapb.AddCellsAliasRequest, opts ...grpc.CallOption) (*vtctldatapb.AddCellsAliasResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.AddCellsAlias(ctx, in, opts...)
+}
+
+// ApplyRoutingRules is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) ApplyRoutingRules(ctx context.Context, in *vtctldatapb.ApplyRoutingRulesRequest, opts ...grpc.CallOption) (*vtctldatapb.ApplyRoutingRulesResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.ApplyRoutingRules(ctx, in, opts...)
+}
+
 // ChangeTabletType is part of the vtctlservicepb.VtctldClient interface.
 func (client *gRPCVtctldClient) ChangeTabletType(ctx context.Context, in *vtctldatapb.ChangeTabletTypeRequest, opts ...grpc.CallOption) (*vtctldatapb.ChangeTabletTypeResponse, error) {
 	if client.c == nil {
@@ -154,6 +181,15 @@ func (client *gRPCVtctldClient) GetKeyspaces(ctx context.Context, in *vtctldatap
 	return client.c.GetKeyspaces(ctx, in, opts...)
 }
 
+// GetRoutingRules is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) GetRoutingRules(ctx context.Context, in *vtctldatapb.GetRoutingRulesRequest, opts ...grpc.CallOption) (*vtctldatapb.GetRoutingRulesResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.GetRoutingRules(ctx, in, opts...)
+}
+
 // GetSchema is part of the vtctlservicepb.VtctldClient interface.
 func (client *gRPCVtctldClient) GetSchema(ctx context.Context, in *vtctldatapb.GetSchemaRequest, opts ...grpc.CallOption) (*vtctldatapb.GetSchemaResponse, error) {
 	if client.c == nil {
@@ -251,6 +287,15 @@ func (client *gRPCVtctldClient) PlannedReparentShard(ctx context.Context, in *vt
 	}
 
 	return client.c.PlannedReparentShard(ctx, in, opts...)
+}
+
+// RebuildVSchemaGraph is part of the vtctlservicepb.VtctldClient interface.
+func (client *gRPCVtctldClient) RebuildVSchemaGraph(ctx context.Context, in *vtctldatapb.RebuildVSchemaGraphRequest, opts ...grpc.CallOption) (*vtctldatapb.RebuildVSchemaGraphResponse, error) {
+	if client.c == nil {
+		return nil, status.Error(codes.Unavailable, connClosedMsg)
+	}
+
+	return client.c.RebuildVSchemaGraph(ctx, in, opts...)
 }
 
 // RemoveKeyspaceCell is part of the vtctlservicepb.VtctldClient interface.

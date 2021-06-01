@@ -57267,6 +57267,1181 @@ $root.vtctldata = (function() {
         return Workflow;
     })();
 
+    vtctldata.AddCellInfoRequest = (function() {
+
+        /**
+         * Properties of an AddCellInfoRequest.
+         * @memberof vtctldata
+         * @interface IAddCellInfoRequest
+         * @property {string|null} [name] AddCellInfoRequest name
+         * @property {topodata.ICellInfo|null} [cell_info] AddCellInfoRequest cell_info
+         */
+
+        /**
+         * Constructs a new AddCellInfoRequest.
+         * @memberof vtctldata
+         * @classdesc Represents an AddCellInfoRequest.
+         * @implements IAddCellInfoRequest
+         * @constructor
+         * @param {vtctldata.IAddCellInfoRequest=} [properties] Properties to set
+         */
+        function AddCellInfoRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * AddCellInfoRequest name.
+         * @member {string} name
+         * @memberof vtctldata.AddCellInfoRequest
+         * @instance
+         */
+        AddCellInfoRequest.prototype.name = "";
+
+        /**
+         * AddCellInfoRequest cell_info.
+         * @member {topodata.ICellInfo|null|undefined} cell_info
+         * @memberof vtctldata.AddCellInfoRequest
+         * @instance
+         */
+        AddCellInfoRequest.prototype.cell_info = null;
+
+        /**
+         * Creates a new AddCellInfoRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {vtctldata.IAddCellInfoRequest=} [properties] Properties to set
+         * @returns {vtctldata.AddCellInfoRequest} AddCellInfoRequest instance
+         */
+        AddCellInfoRequest.create = function create(properties) {
+            return new AddCellInfoRequest(properties);
+        };
+
+        /**
+         * Encodes the specified AddCellInfoRequest message. Does not implicitly {@link vtctldata.AddCellInfoRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {vtctldata.IAddCellInfoRequest} message AddCellInfoRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellInfoRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+            if (message.cell_info != null && Object.hasOwnProperty.call(message, "cell_info"))
+                $root.topodata.CellInfo.encode(message.cell_info, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddCellInfoRequest message, length delimited. Does not implicitly {@link vtctldata.AddCellInfoRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {vtctldata.IAddCellInfoRequest} message AddCellInfoRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellInfoRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddCellInfoRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.AddCellInfoRequest} AddCellInfoRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellInfoRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.AddCellInfoRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.name = reader.string();
+                    break;
+                case 2:
+                    message.cell_info = $root.topodata.CellInfo.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddCellInfoRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.AddCellInfoRequest} AddCellInfoRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellInfoRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddCellInfoRequest message.
+         * @function verify
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddCellInfoRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.name != null && message.hasOwnProperty("name"))
+                if (!$util.isString(message.name))
+                    return "name: string expected";
+            if (message.cell_info != null && message.hasOwnProperty("cell_info")) {
+                var error = $root.topodata.CellInfo.verify(message.cell_info);
+                if (error)
+                    return "cell_info." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates an AddCellInfoRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.AddCellInfoRequest} AddCellInfoRequest
+         */
+        AddCellInfoRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.AddCellInfoRequest)
+                return object;
+            var message = new $root.vtctldata.AddCellInfoRequest();
+            if (object.name != null)
+                message.name = String(object.name);
+            if (object.cell_info != null) {
+                if (typeof object.cell_info !== "object")
+                    throw TypeError(".vtctldata.AddCellInfoRequest.cell_info: object expected");
+                message.cell_info = $root.topodata.CellInfo.fromObject(object.cell_info);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an AddCellInfoRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.AddCellInfoRequest
+         * @static
+         * @param {vtctldata.AddCellInfoRequest} message AddCellInfoRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddCellInfoRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.name = "";
+                object.cell_info = null;
+            }
+            if (message.name != null && message.hasOwnProperty("name"))
+                object.name = message.name;
+            if (message.cell_info != null && message.hasOwnProperty("cell_info"))
+                object.cell_info = $root.topodata.CellInfo.toObject(message.cell_info, options);
+            return object;
+        };
+
+        /**
+         * Converts this AddCellInfoRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.AddCellInfoRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddCellInfoRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return AddCellInfoRequest;
+    })();
+
+    vtctldata.AddCellInfoResponse = (function() {
+
+        /**
+         * Properties of an AddCellInfoResponse.
+         * @memberof vtctldata
+         * @interface IAddCellInfoResponse
+         */
+
+        /**
+         * Constructs a new AddCellInfoResponse.
+         * @memberof vtctldata
+         * @classdesc Represents an AddCellInfoResponse.
+         * @implements IAddCellInfoResponse
+         * @constructor
+         * @param {vtctldata.IAddCellInfoResponse=} [properties] Properties to set
+         */
+        function AddCellInfoResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new AddCellInfoResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {vtctldata.IAddCellInfoResponse=} [properties] Properties to set
+         * @returns {vtctldata.AddCellInfoResponse} AddCellInfoResponse instance
+         */
+        AddCellInfoResponse.create = function create(properties) {
+            return new AddCellInfoResponse(properties);
+        };
+
+        /**
+         * Encodes the specified AddCellInfoResponse message. Does not implicitly {@link vtctldata.AddCellInfoResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {vtctldata.IAddCellInfoResponse} message AddCellInfoResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellInfoResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddCellInfoResponse message, length delimited. Does not implicitly {@link vtctldata.AddCellInfoResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {vtctldata.IAddCellInfoResponse} message AddCellInfoResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellInfoResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddCellInfoResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.AddCellInfoResponse} AddCellInfoResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellInfoResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.AddCellInfoResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddCellInfoResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.AddCellInfoResponse} AddCellInfoResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellInfoResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddCellInfoResponse message.
+         * @function verify
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddCellInfoResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates an AddCellInfoResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.AddCellInfoResponse} AddCellInfoResponse
+         */
+        AddCellInfoResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.AddCellInfoResponse)
+                return object;
+            return new $root.vtctldata.AddCellInfoResponse();
+        };
+
+        /**
+         * Creates a plain object from an AddCellInfoResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.AddCellInfoResponse
+         * @static
+         * @param {vtctldata.AddCellInfoResponse} message AddCellInfoResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddCellInfoResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this AddCellInfoResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.AddCellInfoResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddCellInfoResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return AddCellInfoResponse;
+    })();
+
+    vtctldata.AddCellsAliasRequest = (function() {
+
+        /**
+         * Properties of an AddCellsAliasRequest.
+         * @memberof vtctldata
+         * @interface IAddCellsAliasRequest
+         * @property {string|null} [name] AddCellsAliasRequest name
+         * @property {Array.<string>|null} [cells] AddCellsAliasRequest cells
+         */
+
+        /**
+         * Constructs a new AddCellsAliasRequest.
+         * @memberof vtctldata
+         * @classdesc Represents an AddCellsAliasRequest.
+         * @implements IAddCellsAliasRequest
+         * @constructor
+         * @param {vtctldata.IAddCellsAliasRequest=} [properties] Properties to set
+         */
+        function AddCellsAliasRequest(properties) {
+            this.cells = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * AddCellsAliasRequest name.
+         * @member {string} name
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @instance
+         */
+        AddCellsAliasRequest.prototype.name = "";
+
+        /**
+         * AddCellsAliasRequest cells.
+         * @member {Array.<string>} cells
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @instance
+         */
+        AddCellsAliasRequest.prototype.cells = $util.emptyArray;
+
+        /**
+         * Creates a new AddCellsAliasRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {vtctldata.IAddCellsAliasRequest=} [properties] Properties to set
+         * @returns {vtctldata.AddCellsAliasRequest} AddCellsAliasRequest instance
+         */
+        AddCellsAliasRequest.create = function create(properties) {
+            return new AddCellsAliasRequest(properties);
+        };
+
+        /**
+         * Encodes the specified AddCellsAliasRequest message. Does not implicitly {@link vtctldata.AddCellsAliasRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {vtctldata.IAddCellsAliasRequest} message AddCellsAliasRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellsAliasRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+            if (message.cells != null && message.cells.length)
+                for (var i = 0; i < message.cells.length; ++i)
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.cells[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddCellsAliasRequest message, length delimited. Does not implicitly {@link vtctldata.AddCellsAliasRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {vtctldata.IAddCellsAliasRequest} message AddCellsAliasRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellsAliasRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddCellsAliasRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.AddCellsAliasRequest} AddCellsAliasRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellsAliasRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.AddCellsAliasRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.name = reader.string();
+                    break;
+                case 2:
+                    if (!(message.cells && message.cells.length))
+                        message.cells = [];
+                    message.cells.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddCellsAliasRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.AddCellsAliasRequest} AddCellsAliasRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellsAliasRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddCellsAliasRequest message.
+         * @function verify
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddCellsAliasRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.name != null && message.hasOwnProperty("name"))
+                if (!$util.isString(message.name))
+                    return "name: string expected";
+            if (message.cells != null && message.hasOwnProperty("cells")) {
+                if (!Array.isArray(message.cells))
+                    return "cells: array expected";
+                for (var i = 0; i < message.cells.length; ++i)
+                    if (!$util.isString(message.cells[i]))
+                        return "cells: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates an AddCellsAliasRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.AddCellsAliasRequest} AddCellsAliasRequest
+         */
+        AddCellsAliasRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.AddCellsAliasRequest)
+                return object;
+            var message = new $root.vtctldata.AddCellsAliasRequest();
+            if (object.name != null)
+                message.name = String(object.name);
+            if (object.cells) {
+                if (!Array.isArray(object.cells))
+                    throw TypeError(".vtctldata.AddCellsAliasRequest.cells: array expected");
+                message.cells = [];
+                for (var i = 0; i < object.cells.length; ++i)
+                    message.cells[i] = String(object.cells[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an AddCellsAliasRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @static
+         * @param {vtctldata.AddCellsAliasRequest} message AddCellsAliasRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddCellsAliasRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.cells = [];
+            if (options.defaults)
+                object.name = "";
+            if (message.name != null && message.hasOwnProperty("name"))
+                object.name = message.name;
+            if (message.cells && message.cells.length) {
+                object.cells = [];
+                for (var j = 0; j < message.cells.length; ++j)
+                    object.cells[j] = message.cells[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this AddCellsAliasRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.AddCellsAliasRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddCellsAliasRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return AddCellsAliasRequest;
+    })();
+
+    vtctldata.AddCellsAliasResponse = (function() {
+
+        /**
+         * Properties of an AddCellsAliasResponse.
+         * @memberof vtctldata
+         * @interface IAddCellsAliasResponse
+         */
+
+        /**
+         * Constructs a new AddCellsAliasResponse.
+         * @memberof vtctldata
+         * @classdesc Represents an AddCellsAliasResponse.
+         * @implements IAddCellsAliasResponse
+         * @constructor
+         * @param {vtctldata.IAddCellsAliasResponse=} [properties] Properties to set
+         */
+        function AddCellsAliasResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new AddCellsAliasResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {vtctldata.IAddCellsAliasResponse=} [properties] Properties to set
+         * @returns {vtctldata.AddCellsAliasResponse} AddCellsAliasResponse instance
+         */
+        AddCellsAliasResponse.create = function create(properties) {
+            return new AddCellsAliasResponse(properties);
+        };
+
+        /**
+         * Encodes the specified AddCellsAliasResponse message. Does not implicitly {@link vtctldata.AddCellsAliasResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {vtctldata.IAddCellsAliasResponse} message AddCellsAliasResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellsAliasResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddCellsAliasResponse message, length delimited. Does not implicitly {@link vtctldata.AddCellsAliasResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {vtctldata.IAddCellsAliasResponse} message AddCellsAliasResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddCellsAliasResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddCellsAliasResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.AddCellsAliasResponse} AddCellsAliasResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellsAliasResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.AddCellsAliasResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddCellsAliasResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.AddCellsAliasResponse} AddCellsAliasResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddCellsAliasResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddCellsAliasResponse message.
+         * @function verify
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddCellsAliasResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates an AddCellsAliasResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.AddCellsAliasResponse} AddCellsAliasResponse
+         */
+        AddCellsAliasResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.AddCellsAliasResponse)
+                return object;
+            return new $root.vtctldata.AddCellsAliasResponse();
+        };
+
+        /**
+         * Creates a plain object from an AddCellsAliasResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @static
+         * @param {vtctldata.AddCellsAliasResponse} message AddCellsAliasResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddCellsAliasResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this AddCellsAliasResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.AddCellsAliasResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddCellsAliasResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return AddCellsAliasResponse;
+    })();
+
+    vtctldata.ApplyRoutingRulesRequest = (function() {
+
+        /**
+         * Properties of an ApplyRoutingRulesRequest.
+         * @memberof vtctldata
+         * @interface IApplyRoutingRulesRequest
+         * @property {vschema.IRoutingRules|null} [routing_rules] ApplyRoutingRulesRequest routing_rules
+         * @property {boolean|null} [skip_rebuild] ApplyRoutingRulesRequest skip_rebuild
+         * @property {Array.<string>|null} [rebuild_cells] ApplyRoutingRulesRequest rebuild_cells
+         */
+
+        /**
+         * Constructs a new ApplyRoutingRulesRequest.
+         * @memberof vtctldata
+         * @classdesc Represents an ApplyRoutingRulesRequest.
+         * @implements IApplyRoutingRulesRequest
+         * @constructor
+         * @param {vtctldata.IApplyRoutingRulesRequest=} [properties] Properties to set
+         */
+        function ApplyRoutingRulesRequest(properties) {
+            this.rebuild_cells = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ApplyRoutingRulesRequest routing_rules.
+         * @member {vschema.IRoutingRules|null|undefined} routing_rules
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @instance
+         */
+        ApplyRoutingRulesRequest.prototype.routing_rules = null;
+
+        /**
+         * ApplyRoutingRulesRequest skip_rebuild.
+         * @member {boolean} skip_rebuild
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @instance
+         */
+        ApplyRoutingRulesRequest.prototype.skip_rebuild = false;
+
+        /**
+         * ApplyRoutingRulesRequest rebuild_cells.
+         * @member {Array.<string>} rebuild_cells
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @instance
+         */
+        ApplyRoutingRulesRequest.prototype.rebuild_cells = $util.emptyArray;
+
+        /**
+         * Creates a new ApplyRoutingRulesRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesRequest=} [properties] Properties to set
+         * @returns {vtctldata.ApplyRoutingRulesRequest} ApplyRoutingRulesRequest instance
+         */
+        ApplyRoutingRulesRequest.create = function create(properties) {
+            return new ApplyRoutingRulesRequest(properties);
+        };
+
+        /**
+         * Encodes the specified ApplyRoutingRulesRequest message. Does not implicitly {@link vtctldata.ApplyRoutingRulesRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesRequest} message ApplyRoutingRulesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyRoutingRulesRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.routing_rules != null && Object.hasOwnProperty.call(message, "routing_rules"))
+                $root.vschema.RoutingRules.encode(message.routing_rules, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.skip_rebuild != null && Object.hasOwnProperty.call(message, "skip_rebuild"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.skip_rebuild);
+            if (message.rebuild_cells != null && message.rebuild_cells.length)
+                for (var i = 0; i < message.rebuild_cells.length; ++i)
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.rebuild_cells[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ApplyRoutingRulesRequest message, length delimited. Does not implicitly {@link vtctldata.ApplyRoutingRulesRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesRequest} message ApplyRoutingRulesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyRoutingRulesRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an ApplyRoutingRulesRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.ApplyRoutingRulesRequest} ApplyRoutingRulesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyRoutingRulesRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.ApplyRoutingRulesRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.routing_rules = $root.vschema.RoutingRules.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.skip_rebuild = reader.bool();
+                    break;
+                case 3:
+                    if (!(message.rebuild_cells && message.rebuild_cells.length))
+                        message.rebuild_cells = [];
+                    message.rebuild_cells.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an ApplyRoutingRulesRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.ApplyRoutingRulesRequest} ApplyRoutingRulesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyRoutingRulesRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an ApplyRoutingRulesRequest message.
+         * @function verify
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ApplyRoutingRulesRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.routing_rules != null && message.hasOwnProperty("routing_rules")) {
+                var error = $root.vschema.RoutingRules.verify(message.routing_rules);
+                if (error)
+                    return "routing_rules." + error;
+            }
+            if (message.skip_rebuild != null && message.hasOwnProperty("skip_rebuild"))
+                if (typeof message.skip_rebuild !== "boolean")
+                    return "skip_rebuild: boolean expected";
+            if (message.rebuild_cells != null && message.hasOwnProperty("rebuild_cells")) {
+                if (!Array.isArray(message.rebuild_cells))
+                    return "rebuild_cells: array expected";
+                for (var i = 0; i < message.rebuild_cells.length; ++i)
+                    if (!$util.isString(message.rebuild_cells[i]))
+                        return "rebuild_cells: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates an ApplyRoutingRulesRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.ApplyRoutingRulesRequest} ApplyRoutingRulesRequest
+         */
+        ApplyRoutingRulesRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.ApplyRoutingRulesRequest)
+                return object;
+            var message = new $root.vtctldata.ApplyRoutingRulesRequest();
+            if (object.routing_rules != null) {
+                if (typeof object.routing_rules !== "object")
+                    throw TypeError(".vtctldata.ApplyRoutingRulesRequest.routing_rules: object expected");
+                message.routing_rules = $root.vschema.RoutingRules.fromObject(object.routing_rules);
+            }
+            if (object.skip_rebuild != null)
+                message.skip_rebuild = Boolean(object.skip_rebuild);
+            if (object.rebuild_cells) {
+                if (!Array.isArray(object.rebuild_cells))
+                    throw TypeError(".vtctldata.ApplyRoutingRulesRequest.rebuild_cells: array expected");
+                message.rebuild_cells = [];
+                for (var i = 0; i < object.rebuild_cells.length; ++i)
+                    message.rebuild_cells[i] = String(object.rebuild_cells[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an ApplyRoutingRulesRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @static
+         * @param {vtctldata.ApplyRoutingRulesRequest} message ApplyRoutingRulesRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ApplyRoutingRulesRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.rebuild_cells = [];
+            if (options.defaults) {
+                object.routing_rules = null;
+                object.skip_rebuild = false;
+            }
+            if (message.routing_rules != null && message.hasOwnProperty("routing_rules"))
+                object.routing_rules = $root.vschema.RoutingRules.toObject(message.routing_rules, options);
+            if (message.skip_rebuild != null && message.hasOwnProperty("skip_rebuild"))
+                object.skip_rebuild = message.skip_rebuild;
+            if (message.rebuild_cells && message.rebuild_cells.length) {
+                object.rebuild_cells = [];
+                for (var j = 0; j < message.rebuild_cells.length; ++j)
+                    object.rebuild_cells[j] = message.rebuild_cells[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this ApplyRoutingRulesRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.ApplyRoutingRulesRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ApplyRoutingRulesRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ApplyRoutingRulesRequest;
+    })();
+
+    vtctldata.ApplyRoutingRulesResponse = (function() {
+
+        /**
+         * Properties of an ApplyRoutingRulesResponse.
+         * @memberof vtctldata
+         * @interface IApplyRoutingRulesResponse
+         */
+
+        /**
+         * Constructs a new ApplyRoutingRulesResponse.
+         * @memberof vtctldata
+         * @classdesc Represents an ApplyRoutingRulesResponse.
+         * @implements IApplyRoutingRulesResponse
+         * @constructor
+         * @param {vtctldata.IApplyRoutingRulesResponse=} [properties] Properties to set
+         */
+        function ApplyRoutingRulesResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new ApplyRoutingRulesResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesResponse=} [properties] Properties to set
+         * @returns {vtctldata.ApplyRoutingRulesResponse} ApplyRoutingRulesResponse instance
+         */
+        ApplyRoutingRulesResponse.create = function create(properties) {
+            return new ApplyRoutingRulesResponse(properties);
+        };
+
+        /**
+         * Encodes the specified ApplyRoutingRulesResponse message. Does not implicitly {@link vtctldata.ApplyRoutingRulesResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesResponse} message ApplyRoutingRulesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyRoutingRulesResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ApplyRoutingRulesResponse message, length delimited. Does not implicitly {@link vtctldata.ApplyRoutingRulesResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IApplyRoutingRulesResponse} message ApplyRoutingRulesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyRoutingRulesResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an ApplyRoutingRulesResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.ApplyRoutingRulesResponse} ApplyRoutingRulesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyRoutingRulesResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.ApplyRoutingRulesResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an ApplyRoutingRulesResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.ApplyRoutingRulesResponse} ApplyRoutingRulesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyRoutingRulesResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an ApplyRoutingRulesResponse message.
+         * @function verify
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ApplyRoutingRulesResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates an ApplyRoutingRulesResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.ApplyRoutingRulesResponse} ApplyRoutingRulesResponse
+         */
+        ApplyRoutingRulesResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.ApplyRoutingRulesResponse)
+                return object;
+            return new $root.vtctldata.ApplyRoutingRulesResponse();
+        };
+
+        /**
+         * Creates a plain object from an ApplyRoutingRulesResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @static
+         * @param {vtctldata.ApplyRoutingRulesResponse} message ApplyRoutingRulesResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ApplyRoutingRulesResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this ApplyRoutingRulesResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.ApplyRoutingRulesResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ApplyRoutingRulesResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ApplyRoutingRulesResponse;
+    })();
+
     vtctldata.ChangeTabletTypeRequest = (function() {
 
         /**
@@ -63385,6 +64560,358 @@ $root.vtctldata = (function() {
         return GetKeyspaceResponse;
     })();
 
+    vtctldata.GetRoutingRulesRequest = (function() {
+
+        /**
+         * Properties of a GetRoutingRulesRequest.
+         * @memberof vtctldata
+         * @interface IGetRoutingRulesRequest
+         */
+
+        /**
+         * Constructs a new GetRoutingRulesRequest.
+         * @memberof vtctldata
+         * @classdesc Represents a GetRoutingRulesRequest.
+         * @implements IGetRoutingRulesRequest
+         * @constructor
+         * @param {vtctldata.IGetRoutingRulesRequest=} [properties] Properties to set
+         */
+        function GetRoutingRulesRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new GetRoutingRulesRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IGetRoutingRulesRequest=} [properties] Properties to set
+         * @returns {vtctldata.GetRoutingRulesRequest} GetRoutingRulesRequest instance
+         */
+        GetRoutingRulesRequest.create = function create(properties) {
+            return new GetRoutingRulesRequest(properties);
+        };
+
+        /**
+         * Encodes the specified GetRoutingRulesRequest message. Does not implicitly {@link vtctldata.GetRoutingRulesRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IGetRoutingRulesRequest} message GetRoutingRulesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRoutingRulesRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetRoutingRulesRequest message, length delimited. Does not implicitly {@link vtctldata.GetRoutingRulesRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {vtctldata.IGetRoutingRulesRequest} message GetRoutingRulesRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRoutingRulesRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetRoutingRulesRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.GetRoutingRulesRequest} GetRoutingRulesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRoutingRulesRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.GetRoutingRulesRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetRoutingRulesRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.GetRoutingRulesRequest} GetRoutingRulesRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRoutingRulesRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetRoutingRulesRequest message.
+         * @function verify
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetRoutingRulesRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a GetRoutingRulesRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.GetRoutingRulesRequest} GetRoutingRulesRequest
+         */
+        GetRoutingRulesRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.GetRoutingRulesRequest)
+                return object;
+            return new $root.vtctldata.GetRoutingRulesRequest();
+        };
+
+        /**
+         * Creates a plain object from a GetRoutingRulesRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @static
+         * @param {vtctldata.GetRoutingRulesRequest} message GetRoutingRulesRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetRoutingRulesRequest.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this GetRoutingRulesRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.GetRoutingRulesRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetRoutingRulesRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return GetRoutingRulesRequest;
+    })();
+
+    vtctldata.GetRoutingRulesResponse = (function() {
+
+        /**
+         * Properties of a GetRoutingRulesResponse.
+         * @memberof vtctldata
+         * @interface IGetRoutingRulesResponse
+         * @property {vschema.IRoutingRules|null} [routing_rules] GetRoutingRulesResponse routing_rules
+         */
+
+        /**
+         * Constructs a new GetRoutingRulesResponse.
+         * @memberof vtctldata
+         * @classdesc Represents a GetRoutingRulesResponse.
+         * @implements IGetRoutingRulesResponse
+         * @constructor
+         * @param {vtctldata.IGetRoutingRulesResponse=} [properties] Properties to set
+         */
+        function GetRoutingRulesResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GetRoutingRulesResponse routing_rules.
+         * @member {vschema.IRoutingRules|null|undefined} routing_rules
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @instance
+         */
+        GetRoutingRulesResponse.prototype.routing_rules = null;
+
+        /**
+         * Creates a new GetRoutingRulesResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IGetRoutingRulesResponse=} [properties] Properties to set
+         * @returns {vtctldata.GetRoutingRulesResponse} GetRoutingRulesResponse instance
+         */
+        GetRoutingRulesResponse.create = function create(properties) {
+            return new GetRoutingRulesResponse(properties);
+        };
+
+        /**
+         * Encodes the specified GetRoutingRulesResponse message. Does not implicitly {@link vtctldata.GetRoutingRulesResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IGetRoutingRulesResponse} message GetRoutingRulesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRoutingRulesResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.routing_rules != null && Object.hasOwnProperty.call(message, "routing_rules"))
+                $root.vschema.RoutingRules.encode(message.routing_rules, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetRoutingRulesResponse message, length delimited. Does not implicitly {@link vtctldata.GetRoutingRulesResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {vtctldata.IGetRoutingRulesResponse} message GetRoutingRulesResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetRoutingRulesResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetRoutingRulesResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.GetRoutingRulesResponse} GetRoutingRulesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRoutingRulesResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.GetRoutingRulesResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.routing_rules = $root.vschema.RoutingRules.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GetRoutingRulesResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.GetRoutingRulesResponse} GetRoutingRulesResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetRoutingRulesResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetRoutingRulesResponse message.
+         * @function verify
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetRoutingRulesResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.routing_rules != null && message.hasOwnProperty("routing_rules")) {
+                var error = $root.vschema.RoutingRules.verify(message.routing_rules);
+                if (error)
+                    return "routing_rules." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetRoutingRulesResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.GetRoutingRulesResponse} GetRoutingRulesResponse
+         */
+        GetRoutingRulesResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.GetRoutingRulesResponse)
+                return object;
+            var message = new $root.vtctldata.GetRoutingRulesResponse();
+            if (object.routing_rules != null) {
+                if (typeof object.routing_rules !== "object")
+                    throw TypeError(".vtctldata.GetRoutingRulesResponse.routing_rules: object expected");
+                message.routing_rules = $root.vschema.RoutingRules.fromObject(object.routing_rules);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetRoutingRulesResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @static
+         * @param {vtctldata.GetRoutingRulesResponse} message GetRoutingRulesResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetRoutingRulesResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.routing_rules = null;
+            if (message.routing_rules != null && message.hasOwnProperty("routing_rules"))
+                object.routing_rules = $root.vschema.RoutingRules.toObject(message.routing_rules, options);
+            return object;
+        };
+
+        /**
+         * Converts this GetRoutingRulesResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.GetRoutingRulesResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetRoutingRulesResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return GetRoutingRulesResponse;
+    })();
+
     vtctldata.GetSchemaRequest = (function() {
 
         /**
@@ -68350,6 +69877,369 @@ $root.vtctldata = (function() {
         };
 
         return PlannedReparentShardResponse;
+    })();
+
+    vtctldata.RebuildVSchemaGraphRequest = (function() {
+
+        /**
+         * Properties of a RebuildVSchemaGraphRequest.
+         * @memberof vtctldata
+         * @interface IRebuildVSchemaGraphRequest
+         * @property {Array.<string>|null} [cells] RebuildVSchemaGraphRequest cells
+         */
+
+        /**
+         * Constructs a new RebuildVSchemaGraphRequest.
+         * @memberof vtctldata
+         * @classdesc Represents a RebuildVSchemaGraphRequest.
+         * @implements IRebuildVSchemaGraphRequest
+         * @constructor
+         * @param {vtctldata.IRebuildVSchemaGraphRequest=} [properties] Properties to set
+         */
+        function RebuildVSchemaGraphRequest(properties) {
+            this.cells = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * RebuildVSchemaGraphRequest cells.
+         * @member {Array.<string>} cells
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @instance
+         */
+        RebuildVSchemaGraphRequest.prototype.cells = $util.emptyArray;
+
+        /**
+         * Creates a new RebuildVSchemaGraphRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphRequest=} [properties] Properties to set
+         * @returns {vtctldata.RebuildVSchemaGraphRequest} RebuildVSchemaGraphRequest instance
+         */
+        RebuildVSchemaGraphRequest.create = function create(properties) {
+            return new RebuildVSchemaGraphRequest(properties);
+        };
+
+        /**
+         * Encodes the specified RebuildVSchemaGraphRequest message. Does not implicitly {@link vtctldata.RebuildVSchemaGraphRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphRequest} message RebuildVSchemaGraphRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RebuildVSchemaGraphRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.cells != null && message.cells.length)
+                for (var i = 0; i < message.cells.length; ++i)
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.cells[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RebuildVSchemaGraphRequest message, length delimited. Does not implicitly {@link vtctldata.RebuildVSchemaGraphRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphRequest} message RebuildVSchemaGraphRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RebuildVSchemaGraphRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RebuildVSchemaGraphRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.RebuildVSchemaGraphRequest} RebuildVSchemaGraphRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RebuildVSchemaGraphRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.RebuildVSchemaGraphRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.cells && message.cells.length))
+                        message.cells = [];
+                    message.cells.push(reader.string());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RebuildVSchemaGraphRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.RebuildVSchemaGraphRequest} RebuildVSchemaGraphRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RebuildVSchemaGraphRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RebuildVSchemaGraphRequest message.
+         * @function verify
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RebuildVSchemaGraphRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.cells != null && message.hasOwnProperty("cells")) {
+                if (!Array.isArray(message.cells))
+                    return "cells: array expected";
+                for (var i = 0; i < message.cells.length; ++i)
+                    if (!$util.isString(message.cells[i]))
+                        return "cells: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a RebuildVSchemaGraphRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.RebuildVSchemaGraphRequest} RebuildVSchemaGraphRequest
+         */
+        RebuildVSchemaGraphRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.RebuildVSchemaGraphRequest)
+                return object;
+            var message = new $root.vtctldata.RebuildVSchemaGraphRequest();
+            if (object.cells) {
+                if (!Array.isArray(object.cells))
+                    throw TypeError(".vtctldata.RebuildVSchemaGraphRequest.cells: array expected");
+                message.cells = [];
+                for (var i = 0; i < object.cells.length; ++i)
+                    message.cells[i] = String(object.cells[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a RebuildVSchemaGraphRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @static
+         * @param {vtctldata.RebuildVSchemaGraphRequest} message RebuildVSchemaGraphRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RebuildVSchemaGraphRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.cells = [];
+            if (message.cells && message.cells.length) {
+                object.cells = [];
+                for (var j = 0; j < message.cells.length; ++j)
+                    object.cells[j] = message.cells[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this RebuildVSchemaGraphRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.RebuildVSchemaGraphRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RebuildVSchemaGraphRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RebuildVSchemaGraphRequest;
+    })();
+
+    vtctldata.RebuildVSchemaGraphResponse = (function() {
+
+        /**
+         * Properties of a RebuildVSchemaGraphResponse.
+         * @memberof vtctldata
+         * @interface IRebuildVSchemaGraphResponse
+         */
+
+        /**
+         * Constructs a new RebuildVSchemaGraphResponse.
+         * @memberof vtctldata
+         * @classdesc Represents a RebuildVSchemaGraphResponse.
+         * @implements IRebuildVSchemaGraphResponse
+         * @constructor
+         * @param {vtctldata.IRebuildVSchemaGraphResponse=} [properties] Properties to set
+         */
+        function RebuildVSchemaGraphResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Creates a new RebuildVSchemaGraphResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphResponse=} [properties] Properties to set
+         * @returns {vtctldata.RebuildVSchemaGraphResponse} RebuildVSchemaGraphResponse instance
+         */
+        RebuildVSchemaGraphResponse.create = function create(properties) {
+            return new RebuildVSchemaGraphResponse(properties);
+        };
+
+        /**
+         * Encodes the specified RebuildVSchemaGraphResponse message. Does not implicitly {@link vtctldata.RebuildVSchemaGraphResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphResponse} message RebuildVSchemaGraphResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RebuildVSchemaGraphResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified RebuildVSchemaGraphResponse message, length delimited. Does not implicitly {@link vtctldata.RebuildVSchemaGraphResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {vtctldata.IRebuildVSchemaGraphResponse} message RebuildVSchemaGraphResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        RebuildVSchemaGraphResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a RebuildVSchemaGraphResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.RebuildVSchemaGraphResponse} RebuildVSchemaGraphResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RebuildVSchemaGraphResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.RebuildVSchemaGraphResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a RebuildVSchemaGraphResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.RebuildVSchemaGraphResponse} RebuildVSchemaGraphResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        RebuildVSchemaGraphResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a RebuildVSchemaGraphResponse message.
+         * @function verify
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        RebuildVSchemaGraphResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            return null;
+        };
+
+        /**
+         * Creates a RebuildVSchemaGraphResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.RebuildVSchemaGraphResponse} RebuildVSchemaGraphResponse
+         */
+        RebuildVSchemaGraphResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.RebuildVSchemaGraphResponse)
+                return object;
+            return new $root.vtctldata.RebuildVSchemaGraphResponse();
+        };
+
+        /**
+         * Creates a plain object from a RebuildVSchemaGraphResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @static
+         * @param {vtctldata.RebuildVSchemaGraphResponse} message RebuildVSchemaGraphResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        RebuildVSchemaGraphResponse.toObject = function toObject() {
+            return {};
+        };
+
+        /**
+         * Converts this RebuildVSchemaGraphResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.RebuildVSchemaGraphResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        RebuildVSchemaGraphResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return RebuildVSchemaGraphResponse;
     })();
 
     vtctldata.RemoveKeyspaceCellRequest = (function() {
