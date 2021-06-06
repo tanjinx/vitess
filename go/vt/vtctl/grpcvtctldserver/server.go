@@ -31,6 +31,7 @@ import (
 	"vitess.io/vitess/go/event"
 	"vitess.io/vitess/go/protoutil"
 	"vitess.io/vitess/go/sqlescape"
+	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/concurrency"
 	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/logutil"
@@ -919,6 +920,12 @@ func (s *VtctldServer) GetVSchema(ctx context.Context, req *vtctldatapb.GetVSche
 
 // GetWorkflows is part of the vtctlservicepb.VtctldServer interface.
 func (s *VtctldServer) GetWorkflows(ctx context.Context, req *vtctldatapb.GetWorkflowsRequest) (*vtctldatapb.GetWorkflowsResponse, error) {
+	span, ctx := trace.NewSpan(ctx, "VtctldServer.GetWorkflows")
+	defer span.Finish()
+
+	span.Annotate("keyspace", req.Keyspace)
+	span.Annotate("active_only", req.ActiveOnly)
+
 	return s.ws.GetWorkflows(ctx, req)
 }
 
