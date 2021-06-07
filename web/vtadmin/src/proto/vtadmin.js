@@ -58902,6 +58902,518 @@ $root.vtctldata = (function() {
         return ApplyRoutingRulesResponse;
     })();
 
+    vtctldata.ApplyVSchemaRequest = (function() {
+
+        /**
+         * Properties of an ApplyVSchemaRequest.
+         * @memberof vtctldata
+         * @interface IApplyVSchemaRequest
+         * @property {string|null} [keyspace] ApplyVSchemaRequest keyspace
+         * @property {boolean|null} [skip_rebuild] ApplyVSchemaRequest skip_rebuild
+         * @property {boolean|null} [dry_run] ApplyVSchemaRequest dry_run
+         * @property {Array.<string>|null} [cells] ApplyVSchemaRequest cells
+         * @property {vschema.IKeyspace|null} [v_schema] ApplyVSchemaRequest v_schema
+         * @property {string|null} [sql] ApplyVSchemaRequest sql
+         */
+
+        /**
+         * Constructs a new ApplyVSchemaRequest.
+         * @memberof vtctldata
+         * @classdesc Represents an ApplyVSchemaRequest.
+         * @implements IApplyVSchemaRequest
+         * @constructor
+         * @param {vtctldata.IApplyVSchemaRequest=} [properties] Properties to set
+         */
+        function ApplyVSchemaRequest(properties) {
+            this.cells = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ApplyVSchemaRequest keyspace.
+         * @member {string} keyspace
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.keyspace = "";
+
+        /**
+         * ApplyVSchemaRequest skip_rebuild.
+         * @member {boolean} skip_rebuild
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.skip_rebuild = false;
+
+        /**
+         * ApplyVSchemaRequest dry_run.
+         * @member {boolean} dry_run
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.dry_run = false;
+
+        /**
+         * ApplyVSchemaRequest cells.
+         * @member {Array.<string>} cells
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.cells = $util.emptyArray;
+
+        /**
+         * ApplyVSchemaRequest v_schema.
+         * @member {vschema.IKeyspace|null|undefined} v_schema
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.v_schema = null;
+
+        /**
+         * ApplyVSchemaRequest sql.
+         * @member {string} sql
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         */
+        ApplyVSchemaRequest.prototype.sql = "";
+
+        /**
+         * Creates a new ApplyVSchemaRequest instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {vtctldata.IApplyVSchemaRequest=} [properties] Properties to set
+         * @returns {vtctldata.ApplyVSchemaRequest} ApplyVSchemaRequest instance
+         */
+        ApplyVSchemaRequest.create = function create(properties) {
+            return new ApplyVSchemaRequest(properties);
+        };
+
+        /**
+         * Encodes the specified ApplyVSchemaRequest message. Does not implicitly {@link vtctldata.ApplyVSchemaRequest.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {vtctldata.IApplyVSchemaRequest} message ApplyVSchemaRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyVSchemaRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.keyspace != null && Object.hasOwnProperty.call(message, "keyspace"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.keyspace);
+            if (message.skip_rebuild != null && Object.hasOwnProperty.call(message, "skip_rebuild"))
+                writer.uint32(/* id 2, wireType 0 =*/16).bool(message.skip_rebuild);
+            if (message.dry_run != null && Object.hasOwnProperty.call(message, "dry_run"))
+                writer.uint32(/* id 3, wireType 0 =*/24).bool(message.dry_run);
+            if (message.cells != null && message.cells.length)
+                for (var i = 0; i < message.cells.length; ++i)
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.cells[i]);
+            if (message.v_schema != null && Object.hasOwnProperty.call(message, "v_schema"))
+                $root.vschema.Keyspace.encode(message.v_schema, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.sql != null && Object.hasOwnProperty.call(message, "sql"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.sql);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ApplyVSchemaRequest message, length delimited. Does not implicitly {@link vtctldata.ApplyVSchemaRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {vtctldata.IApplyVSchemaRequest} message ApplyVSchemaRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyVSchemaRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an ApplyVSchemaRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.ApplyVSchemaRequest} ApplyVSchemaRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyVSchemaRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.ApplyVSchemaRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.keyspace = reader.string();
+                    break;
+                case 2:
+                    message.skip_rebuild = reader.bool();
+                    break;
+                case 3:
+                    message.dry_run = reader.bool();
+                    break;
+                case 4:
+                    if (!(message.cells && message.cells.length))
+                        message.cells = [];
+                    message.cells.push(reader.string());
+                    break;
+                case 5:
+                    message.v_schema = $root.vschema.Keyspace.decode(reader, reader.uint32());
+                    break;
+                case 6:
+                    message.sql = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an ApplyVSchemaRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.ApplyVSchemaRequest} ApplyVSchemaRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyVSchemaRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an ApplyVSchemaRequest message.
+         * @function verify
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ApplyVSchemaRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.keyspace != null && message.hasOwnProperty("keyspace"))
+                if (!$util.isString(message.keyspace))
+                    return "keyspace: string expected";
+            if (message.skip_rebuild != null && message.hasOwnProperty("skip_rebuild"))
+                if (typeof message.skip_rebuild !== "boolean")
+                    return "skip_rebuild: boolean expected";
+            if (message.dry_run != null && message.hasOwnProperty("dry_run"))
+                if (typeof message.dry_run !== "boolean")
+                    return "dry_run: boolean expected";
+            if (message.cells != null && message.hasOwnProperty("cells")) {
+                if (!Array.isArray(message.cells))
+                    return "cells: array expected";
+                for (var i = 0; i < message.cells.length; ++i)
+                    if (!$util.isString(message.cells[i]))
+                        return "cells: string[] expected";
+            }
+            if (message.v_schema != null && message.hasOwnProperty("v_schema")) {
+                var error = $root.vschema.Keyspace.verify(message.v_schema);
+                if (error)
+                    return "v_schema." + error;
+            }
+            if (message.sql != null && message.hasOwnProperty("sql"))
+                if (!$util.isString(message.sql))
+                    return "sql: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an ApplyVSchemaRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.ApplyVSchemaRequest} ApplyVSchemaRequest
+         */
+        ApplyVSchemaRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.ApplyVSchemaRequest)
+                return object;
+            var message = new $root.vtctldata.ApplyVSchemaRequest();
+            if (object.keyspace != null)
+                message.keyspace = String(object.keyspace);
+            if (object.skip_rebuild != null)
+                message.skip_rebuild = Boolean(object.skip_rebuild);
+            if (object.dry_run != null)
+                message.dry_run = Boolean(object.dry_run);
+            if (object.cells) {
+                if (!Array.isArray(object.cells))
+                    throw TypeError(".vtctldata.ApplyVSchemaRequest.cells: array expected");
+                message.cells = [];
+                for (var i = 0; i < object.cells.length; ++i)
+                    message.cells[i] = String(object.cells[i]);
+            }
+            if (object.v_schema != null) {
+                if (typeof object.v_schema !== "object")
+                    throw TypeError(".vtctldata.ApplyVSchemaRequest.v_schema: object expected");
+                message.v_schema = $root.vschema.Keyspace.fromObject(object.v_schema);
+            }
+            if (object.sql != null)
+                message.sql = String(object.sql);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an ApplyVSchemaRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @static
+         * @param {vtctldata.ApplyVSchemaRequest} message ApplyVSchemaRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ApplyVSchemaRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.cells = [];
+            if (options.defaults) {
+                object.keyspace = "";
+                object.skip_rebuild = false;
+                object.dry_run = false;
+                object.v_schema = null;
+                object.sql = "";
+            }
+            if (message.keyspace != null && message.hasOwnProperty("keyspace"))
+                object.keyspace = message.keyspace;
+            if (message.skip_rebuild != null && message.hasOwnProperty("skip_rebuild"))
+                object.skip_rebuild = message.skip_rebuild;
+            if (message.dry_run != null && message.hasOwnProperty("dry_run"))
+                object.dry_run = message.dry_run;
+            if (message.cells && message.cells.length) {
+                object.cells = [];
+                for (var j = 0; j < message.cells.length; ++j)
+                    object.cells[j] = message.cells[j];
+            }
+            if (message.v_schema != null && message.hasOwnProperty("v_schema"))
+                object.v_schema = $root.vschema.Keyspace.toObject(message.v_schema, options);
+            if (message.sql != null && message.hasOwnProperty("sql"))
+                object.sql = message.sql;
+            return object;
+        };
+
+        /**
+         * Converts this ApplyVSchemaRequest to JSON.
+         * @function toJSON
+         * @memberof vtctldata.ApplyVSchemaRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ApplyVSchemaRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ApplyVSchemaRequest;
+    })();
+
+    vtctldata.ApplyVSchemaResponse = (function() {
+
+        /**
+         * Properties of an ApplyVSchemaResponse.
+         * @memberof vtctldata
+         * @interface IApplyVSchemaResponse
+         * @property {vschema.IKeyspace|null} [v_schema] ApplyVSchemaResponse v_schema
+         */
+
+        /**
+         * Constructs a new ApplyVSchemaResponse.
+         * @memberof vtctldata
+         * @classdesc Represents an ApplyVSchemaResponse.
+         * @implements IApplyVSchemaResponse
+         * @constructor
+         * @param {vtctldata.IApplyVSchemaResponse=} [properties] Properties to set
+         */
+        function ApplyVSchemaResponse(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ApplyVSchemaResponse v_schema.
+         * @member {vschema.IKeyspace|null|undefined} v_schema
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @instance
+         */
+        ApplyVSchemaResponse.prototype.v_schema = null;
+
+        /**
+         * Creates a new ApplyVSchemaResponse instance using the specified properties.
+         * @function create
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {vtctldata.IApplyVSchemaResponse=} [properties] Properties to set
+         * @returns {vtctldata.ApplyVSchemaResponse} ApplyVSchemaResponse instance
+         */
+        ApplyVSchemaResponse.create = function create(properties) {
+            return new ApplyVSchemaResponse(properties);
+        };
+
+        /**
+         * Encodes the specified ApplyVSchemaResponse message. Does not implicitly {@link vtctldata.ApplyVSchemaResponse.verify|verify} messages.
+         * @function encode
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {vtctldata.IApplyVSchemaResponse} message ApplyVSchemaResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyVSchemaResponse.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.v_schema != null && Object.hasOwnProperty.call(message, "v_schema"))
+                $root.vschema.Keyspace.encode(message.v_schema, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ApplyVSchemaResponse message, length delimited. Does not implicitly {@link vtctldata.ApplyVSchemaResponse.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {vtctldata.IApplyVSchemaResponse} message ApplyVSchemaResponse message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApplyVSchemaResponse.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an ApplyVSchemaResponse message from the specified reader or buffer.
+         * @function decode
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {vtctldata.ApplyVSchemaResponse} ApplyVSchemaResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyVSchemaResponse.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.vtctldata.ApplyVSchemaResponse();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.v_schema = $root.vschema.Keyspace.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an ApplyVSchemaResponse message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {vtctldata.ApplyVSchemaResponse} ApplyVSchemaResponse
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApplyVSchemaResponse.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an ApplyVSchemaResponse message.
+         * @function verify
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ApplyVSchemaResponse.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.v_schema != null && message.hasOwnProperty("v_schema")) {
+                var error = $root.vschema.Keyspace.verify(message.v_schema);
+                if (error)
+                    return "v_schema." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates an ApplyVSchemaResponse message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {vtctldata.ApplyVSchemaResponse} ApplyVSchemaResponse
+         */
+        ApplyVSchemaResponse.fromObject = function fromObject(object) {
+            if (object instanceof $root.vtctldata.ApplyVSchemaResponse)
+                return object;
+            var message = new $root.vtctldata.ApplyVSchemaResponse();
+            if (object.v_schema != null) {
+                if (typeof object.v_schema !== "object")
+                    throw TypeError(".vtctldata.ApplyVSchemaResponse.v_schema: object expected");
+                message.v_schema = $root.vschema.Keyspace.fromObject(object.v_schema);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an ApplyVSchemaResponse message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @static
+         * @param {vtctldata.ApplyVSchemaResponse} message ApplyVSchemaResponse
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ApplyVSchemaResponse.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.v_schema = null;
+            if (message.v_schema != null && message.hasOwnProperty("v_schema"))
+                object.v_schema = $root.vschema.Keyspace.toObject(message.v_schema, options);
+            return object;
+        };
+
+        /**
+         * Converts this ApplyVSchemaResponse to JSON.
+         * @function toJSON
+         * @memberof vtctldata.ApplyVSchemaResponse
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ApplyVSchemaResponse.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return ApplyVSchemaResponse;
+    })();
+
     vtctldata.ChangeTabletTypeRequest = (function() {
 
         /**
