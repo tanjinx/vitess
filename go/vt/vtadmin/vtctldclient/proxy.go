@@ -24,6 +24,7 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtctl/grpcvtctldclient"
 	"vitess.io/vitess/go/vt/vtctl/vtctldclient"
@@ -91,12 +92,20 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	defer span.Finish()
 
 	if vtctld.VtctldClient != nil {
-		if !vtctld.closed {
-			span.Annotate("is_noop", true)
+		log.Infof("Have vtctld connection to %s\n", vtctld.host)
 
-			return nil
+		if !vtctld.closed {
+			// Even though we have an "open" connection to a vtctld,
+			// we also need to check that it's ready and usable.
+			err := vtctld.VtctldClient.WaitForReady(ctx)
+
+			if err == nil {
+				span.Annotate("is_noop", true)
+				return nil
+			}
 		}
 
+		log.Infof("Stale connection to vtctld %s, closing and redialing", vtctld.host)
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
@@ -125,6 +134,12 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	}
 
 	client, err := vtctld.DialFunc(addr, grpcclient.FailFast(false), opts...)
+	if err != nil {
+		return err
+	}
+
+	// TODO log and fail? retry? hm
+	err = vtctld.VtctldClient.WaitForReady(ctx)
 	if err != nil {
 		return err
 	}

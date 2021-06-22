@@ -19,9 +19,15 @@ limitations under the License.
 package grpcvtctldclient
 
 import (
+	"context"
+	"fmt"
+	"time"
+
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtctl/grpcclientcommon"
 	"vitess.io/vitess/go/vt/vtctl/vtctldclient"
 
@@ -76,6 +82,41 @@ func (client *gRPCVtctldClient) Close() error {
 	}
 
 	return err
+}
+
+func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("connWaitTimeoutExceeded") // TODO proper error lol
+
+		// wait and check
+		default:
+			// See https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md
+			state := client.cc.GetState()
+			log.Infof("gRPCVtctldClient state: %s\n", state)
+
+			switch state {
+
+			case connectivity.Idle, connectivity.Ready:
+				return nil
+
+			default:
+				// TODO make a connWaitTimeout flag for second parameter
+				ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+				defer cancel()
+
+				// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
+				if !client.cc.WaitForStateChange(ctx, state) {
+					// failed to transition, close, and get a new connection
+					return fmt.Errorf("failed to transition")
+				}
+				// Allow function to iterate one more time in order to
+				// verify the connection is Idle/Ready and then return
+			}
+
+		}
+	}
 }
 
 func init() {

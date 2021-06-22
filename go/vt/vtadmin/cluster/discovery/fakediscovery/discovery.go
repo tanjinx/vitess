@@ -20,6 +20,7 @@ package fakediscovery
 import (
 	"context"
 	"math/rand"
+	"sort"
 
 	"github.com/stretchr/testify/assert"
 
@@ -44,6 +45,8 @@ type gates struct {
 type Fake struct {
 	gates   *gates
 	vtctlds *vtctlds
+
+	vtctldCounter int
 }
 
 // New returns a new fake.
@@ -57,6 +60,7 @@ func New() *Fake {
 			byTag:  map[string][]*vtadminpb.Vtctld{},
 			byName: map[string]*vtadminpb.Vtctld{},
 		},
+		vtctldCounter: 0,
 	}
 }
 
@@ -227,5 +231,17 @@ func (d *Fake) DiscoverVtctld(ctx context.Context, tags []string) (*vtadminpb.Vt
 		return nil, assert.AnError
 	}
 
-	return vtctlds[rand.Intn(len(vtctlds))], nil
+	sort.Slice(vtctlds, func(i, j int) bool {
+		return vtctlds[i].Hostname < vtctlds[j].Hostname
+	})
+
+	// return vtctlds[rand.Intn(len(vtctlds))], nil
+	vtctld := vtctlds[d.vtctldCounter]
+
+	d.vtctldCounter = d.vtctldCounter + 1
+	if d.vtctldCounter > len(vtctlds)-1 {
+		d.vtctldCounter = 0
+	}
+
+	return vtctld, nil
 }
