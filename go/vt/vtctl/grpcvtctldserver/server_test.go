@@ -285,9 +285,11 @@ func TestApplyRoutingRules(t *testing.T) {
 			shouldErr: false,
 		},
 		{
-			name:      "topo down",
-			cells:     []string{"zone1"},
-			req:       &vtctldatapb.ApplyRoutingRulesRequest{},
+			name:  "topo down",
+			cells: []string{"zone1"},
+			req: &vtctldatapb.ApplyRoutingRulesRequest{
+				RoutingRules: &vschemapb.RoutingRules{},
+			},
 			topoDown:  true,
 			shouldErr: true,
 		},
@@ -431,9 +433,7 @@ func TestApplyVSchema(t *testing.T) {
 						},
 					},
 				},
-				RoutingRules: &vschemapb.RoutingRules{
-					Rules: []*vschemapb.RoutingRule{},
-				},
+				RoutingRules: &vschemapb.RoutingRules{},
 			}
 			err = ts.UpdateSrvVSchema(ctx, "zone1", origSrvVSchema)
 			require.NoError(t, err)
@@ -465,9 +465,7 @@ func TestApplyVSchema(t *testing.T) {
 							Sharded: false,
 						},
 					},
-					RoutingRules: &vschemapb.RoutingRules{
-						Rules: []*vschemapb.RoutingRule{},
-					},
+					RoutingRules: &vschemapb.RoutingRules{},
 				}
 				utils.MustMatch(t, changedSrvVSchema, finalSrvVSchema)
 			}
@@ -3643,9 +3641,7 @@ func TestGetSrvVSchemas(t *testing.T) {
 								RequireExplicitRouting: false,
 							},
 						},
-						RoutingRules: &vschemapb.RoutingRules{
-							Rules: []*vschemapb.RoutingRule{},
-						},
+						RoutingRules: &vschemapb.RoutingRules{},
 					},
 					"zone2": {
 						Keyspaces: map[string]*vschemapb.Keyspace{
@@ -3658,11 +3654,9 @@ func TestGetSrvVSchemas(t *testing.T) {
 								RequireExplicitRouting: false,
 							},
 						},
-						RoutingRules: &vschemapb.RoutingRules{
-							Rules: []*vschemapb.RoutingRule{},
-						},
+						RoutingRules: &vschemapb.RoutingRules{},
 					},
-					"zone3": {},
+					"zone3": nil,
 				},
 			},
 		},
@@ -3684,9 +3678,7 @@ func TestGetSrvVSchemas(t *testing.T) {
 								RequireExplicitRouting: false,
 							},
 						},
-						RoutingRules: &vschemapb.RoutingRules{
-							Rules: []*vschemapb.RoutingRule{},
-						},
+						RoutingRules: &vschemapb.RoutingRules{},
 					},
 				},
 			},
@@ -3698,7 +3690,7 @@ func TestGetSrvVSchemas(t *testing.T) {
 			},
 			expected: &vtctldatapb.GetSrvVSchemasResponse{
 				SrvVSchemas: map[string]*vschemapb.SrvVSchema{
-					"zone3": {},
+					"zone3": nil,
 				},
 			},
 		},
@@ -3733,9 +3725,7 @@ func TestGetSrvVSchemas(t *testing.T) {
 								RequireExplicitRouting: false,
 							},
 						},
-						RoutingRules: &vschemapb.RoutingRules{
-							Rules: []*vschemapb.RoutingRule{},
-						},
+						RoutingRules: &vschemapb.RoutingRules{},
 					},
 				},
 			},
