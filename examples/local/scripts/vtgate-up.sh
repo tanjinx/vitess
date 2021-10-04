@@ -18,18 +18,19 @@
 
 source ./env.sh
 
+cluster=${CLUSTER:-'local'}
 cell=${CELL:-'test'}
-web_port=15001
-grpc_port=15991
-mysql_server_port=15306
-mysql_server_socket_path="/tmp/mysql.sock"
+web_port=${WEB_PORT:-15001}
+grpc_port=${GRPC_PORT:-15991}
+mysql_server_port=${MYSQL_PORT:-15306}
+mysql_server_socket_path="/tmp/${cluster}.mysql.sock"
 
 # Start vtgate.
 # shellcheck disable=SC2086
 vtgate \
   $TOPOLOGY_FLAGS \
-  -log_dir $VTDATAROOT/tmp \
-  -log_queries_to_file $VTDATAROOT/tmp/vtgate_querylog.txt \
+  -log_dir $VTDATAROOT/tmp/$cluster \
+  -log_queries_to_file $VTDATAROOT/tmp/$cluster/vtgate_querylog.txt \
   -port $web_port \
   -grpc_port $grpc_port \
   -mysql_server_port $mysql_server_port \
@@ -38,9 +39,9 @@ vtgate \
   -cells_to_watch $cell \
   -tablet_types_to_wait PRIMARY,REPLICA \
   -service_map 'grpc-vtgateservice' \
-  -pid_file $VTDATAROOT/tmp/vtgate.pid \
+  -pid_file $VTDATAROOT/tmp/$cluster/vtgate.pid \
   -mysql_auth_server_impl none \
-  > $VTDATAROOT/tmp/vtgate.out 2>&1 &
+  > $VTDATAROOT/tmp/$cluster/vtgate.out 2>&1 &
 
 # Block waiting for vtgate to be listening
 # Not the same as healthy
