@@ -62,7 +62,7 @@ elif [ "${TOPO}" = "k8s" ]; then
     # shellcheck disable=SC2034
     TOPOLOGY_FLAGS="-topo_implementation k8s -topo_k8s_kubeconfig ${K8S_KUBECONFIG} -topo_global_server_address ${K8S_ADDR}:${K8S_PORT} -topo_global_root /vitess/global"
 else
-    ETCD_SERVER="localhost:2379"
+    #ETCD_SERVER="localhost:2379"
     TOPOLOGY_FLAGS="-topo_implementation etcd2 -topo_global_server_address $ETCD_SERVER -topo_global_root /vitess/global"
 
     mkdir -p "${VTDATAROOT}/etcd"

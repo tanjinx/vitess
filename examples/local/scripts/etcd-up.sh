@@ -18,15 +18,20 @@
 
 source ./env.sh
 
+echo "starting etcd at: ${ETCD_SERVER} (peers: ${ETCD_PEER_SERVER})"
+tmpdir="${VTDATAROOT}/tmp/etcd/${ETCD_SERVER}"
+datadir="${VTDATAROOT}/etcd/${ETCD_SERVER}"
+mkdir -p "${tmpdir}" "${datadir}"
+
 cell=${CELL:-'test'}
 export ETCDCTL_API=2
 
 # Check that etcd is not already running
 curl "http://${ETCD_SERVER}" > /dev/null 2>&1 && fail "etcd is already running. Exiting."
 
-etcd --enable-v2=true --data-dir "${VTDATAROOT}/etcd/"  --listen-client-urls "http://${ETCD_SERVER}" --advertise-client-urls "http://${ETCD_SERVER}" > "${VTDATAROOT}"/tmp/etcd.out 2>&1 &
+etcd --enable-v2=true --data-dir "${datadir}" --listen-peer-urls="http://${ETCD_PEER_SERVER}" --listen-client-urls "http://${ETCD_SERVER}" --advertise-client-urls "http://${ETCD_SERVER}" > "${tmpdir}"/etcd.out 2>&1 &
 PID=$!
-echo $PID > "${VTDATAROOT}/tmp/etcd.pid"
+echo $PID > "${tmpdir}/etcd.pid"
 sleep 5
 
 echo "add /vitess/global"
