@@ -15,7 +15,8 @@ vtadmin \
   --logtostderr \
   --alsologtostderr \
   --rbac-config="./vtadmin/rbac.yaml" \
-  --cluster "id=local,name=local,discovery=staticfile,discovery-staticfile-path=./vtadmin/discovery.json,tablet-fqdn-tmpl={{ .Tablet.Hostname }}:15{{ .Tablet.Alias.Uid }}" \
+  --cluster "id=local1,name=local1,discovery=staticfile,discovery-staticfile-path=${VTDATAROOT}/vtadmin_discovery_local1.json,tablet-fqdn-tmpl={{ .Tablet.Hostname }}:15{{ .Tablet.Alias.Uid }}" \
+  --cluster "id=local2,name=local2,discovery=staticfile,discovery-staticfile-path=${VTDATAROOT}/vtadmin_discovery_local2.json,tablet-fqdn-tmpl={{ .Tablet.Hostname }}:15{{ .Tablet.Alias.Uid }}" \
   > "${log_dir}/vtadmin-api.out" 2>&1 &
 vtadmin_pid=$!
 
