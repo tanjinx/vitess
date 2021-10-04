@@ -18,13 +18,14 @@
 
 source ./env.sh
 
+cluster=${CLUSTER:-'local'}
 cell=${CELL:-'test'}
 uid=$TABLET_UID
 mysql_port=$[17000 + $uid]
 printf -v alias '%s-%010d' $cell $uid
 printf -v tablet_dir 'vt_%010d' $uid
 
-mkdir -p $VTDATAROOT/backups
+mkdir -p $VTDATAROOT/$cluster/backups
 
 echo "Starting MySQL for tablet $alias..."
 action="init"
@@ -36,7 +37,7 @@ if [ -d $VTDATAROOT/$tablet_dir ]; then
 fi
 
 mysqlctl \
- -log_dir $VTDATAROOT/tmp \
+ -log_dir $VTDATAROOT/tmp/$cluster \
  -tablet_uid $uid \
  -mysql_port $mysql_port \
  $action

@@ -16,6 +16,8 @@
 
 source ./env.sh
 
+vtctld_web_port=${VTCTLD_WEB_PORT:-'15000'}
+cluster=${CLUSTER:-'local'}
 cell=${CELL:-'test'}
 keyspace=${KEYSPACE:-'test_keyspace'}
 shard=${SHARD:-'0'}
@@ -33,12 +35,14 @@ if [[ "${uid: -1}" -gt 1 ]]; then
  tablet_type=rdonly
 fi
 
+mkdir -p $VTDATAROOT/$cluster/$tablet_dir
+
 echo "Starting vttablet for $alias..."
 # shellcheck disable=SC2086
 vttablet \
  $TOPOLOGY_FLAGS \
- -log_dir $VTDATAROOT/tmp \
- -log_queries_to_file $VTDATAROOT/tmp/$tablet_logfile \
+ -log_dir $VTDATAROOT/tmp/$cluster \
+ -log_queries_to_file $VTDATAROOT/tmp/$cluster/$tablet_logfile \
  -tablet-path $alias \
  -tablet_hostname "$tablet_hostname" \
  -init_keyspace $keyspace \
@@ -48,14 +52,14 @@ vttablet \
  -enable_semi_sync \
  -enable_replication_reporter \
  -backup_storage_implementation file \
- -file_backup_storage_root $VTDATAROOT/backups \
+ -file_backup_storage_root $VTDATAROOT/$cluster/backups \
  -restore_from_backup \
  -port $port \
  -grpc_port $grpc_port \
  -service_map 'grpc-queryservice,grpc-tabletmanager,grpc-updatestream' \
- -pid_file $VTDATAROOT/$tablet_dir/vttablet.pid \
+ -pid_file $VTDATAROOT/$cluster/$tablet_dir/vttablet.pid \
  -vtctld_addr http://$hostname:$vtctld_web_port/ \
- > $VTDATAROOT/$tablet_dir/vttablet.out 2>&1 &
+ > $VTDATAROOT/$cluster/$tablet_dir/vttablet.out 2>&1 &
 
 # Block waiting for the tablet to be listening
 # Not the same as healthy
