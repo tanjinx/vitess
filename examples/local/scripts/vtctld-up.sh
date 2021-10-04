@@ -19,7 +19,12 @@
 source ./env.sh
 
 cell=${CELL:-'test'}
-grpc_port=15999
+vtctld_web_port=${VTCTLD_WEB_PORT:-'15000'}
+grpc_port=${GRPC_PORT:-'15999'}
+cluster=${CLUSTER:-'local'}
+
+cluster_dir="${VTDATAROOT}/tmp/${cluster}"
+mkdir -p "${cluster_dir}"
 
 echo "Starting vtctld..."
 # shellcheck disable=SC2086
@@ -30,9 +35,9 @@ vtctld \
  -workflow_manager_use_election \
  -service_map 'grpc-vtctl,grpc-vtctld' \
  -backup_storage_implementation file \
- -file_backup_storage_root $VTDATAROOT/backups \
- -log_dir $VTDATAROOT/tmp \
+ -file_backup_storage_root $VTDATAROOT/$cluster \
+ -log_dir ${cluster_dir}/${grpc_port} \
  -port $vtctld_web_port \
  -grpc_port $grpc_port \
- -pid_file $VTDATAROOT/tmp/vtctld.pid \
-  > $VTDATAROOT/tmp/vtctld.out 2>&1 &
+ -pid_file ${cluster_dir}/vtctld.${grpc_port}.pid \
+  > ${cluster_dir}/vtctld.${grpc_port}.out 2>&1 &
