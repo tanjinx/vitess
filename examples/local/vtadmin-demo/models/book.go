@@ -48,7 +48,6 @@ func (b *Book) binds() []interface{} {
 type BookInserter struct {
 	m     sync.Mutex
 	buf   *bytes.Buffer
-	ctx   context.Context
 	books []*Book
 	opts  InsertParams
 }
