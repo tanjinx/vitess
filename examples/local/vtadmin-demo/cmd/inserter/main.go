@@ -30,12 +30,16 @@ var (
 )
 
 func getInserter(ctx context.Context, model string, path string) (models.Inserter, error) {
+	params := models.InsertParams{
+		BatchSize: *batchSize,
+		Debug:     *debug,
+	}
+
 	switch model {
 	case "books":
-		return models.NewBookInserter(ctx, path, models.InsertParams{
-			BatchSize: *batchSize,
-			Debug:     *debug,
-		})
+		return models.NewBookInserter(ctx, path, params)
+	case "song_charts", "songcharts":
+		return models.NewSongChartInserter(ctx, path, params)
 	}
 
 	return nil, nil /* TODO: error */
