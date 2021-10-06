@@ -99,7 +99,7 @@ func (sdi *SongDataInserter) Insert(ctx context.Context, db *sql.DB) (int64, err
 		batchSize = len(sdi.songdata)
 	}
 
-	binds := make([]interface{}, 0, batchSize*12)
+	binds := make([]interface{}, 0, batchSize*6)
 	for i := 0; i < batchSize; i++ {
 		sdi.buf.WriteString("(?, ?, ?, ?, ?, ?)")
 		binds = append(binds, sdi.songdata[i].binds()...)

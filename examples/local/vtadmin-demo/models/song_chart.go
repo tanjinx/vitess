@@ -101,7 +101,7 @@ func (sci *SongChartInserter) Insert(ctx context.Context, db *sql.DB) (int64, er
 		batchSize = len(sci.songcharts)
 	}
 
-	binds := make([]interface{}, 0, batchSize*12)
+	binds := make([]interface{}, 0, batchSize*7)
 	for i := 0; i < batchSize; i++ {
 		sci.buf.WriteString("(?, ?, ?, ?, ?, ?, ?)")
 		binds = append(binds, sci.songcharts[i].binds()...)
