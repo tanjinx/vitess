@@ -40,6 +40,8 @@ func getInserter(ctx context.Context, model string, path string) (models.Inserte
 		return models.NewBookInserter(ctx, path, params)
 	case "song_charts", "songcharts":
 		return models.NewSongChartInserter(ctx, path, params)
+	case "song_data":
+		return models.NewSongDataInserter(ctx, path, params)
 	}
 
 	return nil, nil /* TODO: error */
