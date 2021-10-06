@@ -3,6 +3,9 @@
     "vindexes": {
       "hash": {
         "type": "hash"
+      },
+      "binary_md5": {
+        "type": "binary_md5"
       }
     },
     "tables": {
@@ -25,16 +28,16 @@
       "song_data": {
         "column_vindexes": [
           {
-            "column": "id",
-            "name": "hash"
+            "column": "track_id",
+            "name": "binary_md5"
           }
         ]
       },
       "song_statwords": {
         "column_vindexes": [
           {
-            "column": "id",
-            "name": "hash"
+            "column": "track_id",
+            "name": "binary_md5"
           }
         ]
       }
