@@ -1,0 +1,43 @@
+{
+    "sharded": true,
+    "vindexes": {
+      "hash": {
+        "type": "hash"
+      }
+    },
+    "tables": {
+      "books": {
+        "column_vindexes": [
+          {
+            "column": "id",
+            "name": "hash"
+          }
+        ]
+      },
+      "song_charts": {
+        "column_vindexes": [
+          {
+            "column": "id",
+            "name": "hash"
+          }
+        ]
+      },
+      "song_data": {
+        "column_vindexes": [
+          {
+            "column": "id",
+            "name": "hash"
+          }
+        ]
+      },
+      "song_statwords": {
+        "column_vindexes": [
+          {
+            "column": "id",
+            "name": "hash"
+          }
+        ]
+      }
+    }
+  }
+  
