@@ -84,7 +84,7 @@ export const NavRail = () => {
                 </ul>
             </div>
 
-            <div className="my-8">
+            <div className="mt-auto mb-8">
                 <ul className={style.navList}>
                     <li>
                         <NavRailLink icon={Icons.bug} text="Debug" to="/debug" />
