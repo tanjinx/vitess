@@ -35,11 +35,11 @@ export const NavRail = () => {
 
     return (
         <div className={style.container}>
-            <Link className={style.logoContainer} to="/">
-                <img alt="Vitess logo" className={style.logo} src={logo} height={40}></img>
+            <Link className="mt-8" to="/">
+                <img alt="Vitess logo" className="h-16 mx-auto" src={logo} height={40}></img>
             </Link>
 
-            <div className={style.navLinks}>
+            <div className="my-8">
                 <ul className={style.navList}>
                     <li>
                         <NavRailLink icon={Icons.chart} text="Dashboard" to="/dashboard" count={0} />
@@ -84,7 +84,7 @@ export const NavRail = () => {
                 </ul>
             </div>
 
-            <div className={style.footerContainer}>
+            <div className="my-8">
                 <ul className={style.navList}>
                     <li>
                         <NavRailLink icon={Icons.bug} text="Debug" to="/debug" />

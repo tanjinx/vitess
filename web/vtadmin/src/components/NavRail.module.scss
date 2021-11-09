@@ -26,24 +26,8 @@ $navRailHoverTransition: background-color 0.1s ease-in-out;
     overflow-y: auto;
 }
 
-.logoContainer {
-    display: block;
-    padding: 24px;
-    text-align: center;
-}
-
-.footerContainer {
-    margin: auto 0 24px 0;
-}
-
-.navLinks {
-    margin: 24px 0 32px 0;
-}
-
 .navList {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+    @apply list-none m-0 p-0;
 
     &::after {
         content: '';
