@@ -237,10 +237,6 @@ table tbody td[rowSpan] {
     max-width: var(--contentWidth);
 }
 
-.text-align-center {
-    text-align: center;
-}
-
 .text-color-secondary {
     color: var(--textColorSecondary);
 }
