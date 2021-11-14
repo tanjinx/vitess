@@ -35,6 +35,7 @@ import { Tablet } from './routes/tablet/Tablet';
 import { Backups } from './routes/Backups';
 import { Shard } from './routes/shard/Shard';
 import { Vtctlds } from './routes/Vtctlds';
+import { CreateKeyspace } from './routes/createKeyspace/CreateKeyspace';
 
 export const App = () => {
     return (
@@ -56,6 +57,10 @@ export const App = () => {
 
                         <Route path="/gates">
                             <Gates />
+                        </Route>
+
+                        <Route exact path="/keyspaces/create">
+                            <CreateKeyspace />
                         </Route>
 
                         <Route path="/keyspaces">
