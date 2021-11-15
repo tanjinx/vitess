@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useState } from 'react';
 import { Switch, useLocation, useParams, useRouteMatch } from 'react-router';
 import { Link, Redirect, Route } from 'react-router-dom';
 
@@ -28,6 +29,11 @@ import { Tab } from '../../tabs/Tab';
 import { TabContainer } from '../../tabs/TabContainer';
 import style from './Keyspace.module.scss';
 import { KeyspaceShards } from './KeyspaceShards';
+import Modal from 'react-modal';
+import { TextInput } from '../../TextInput';
+import { Button } from '../../Button';
+
+Modal.setAppElement('#root');
 
 interface RouteParams {
     clusterID: string;
@@ -40,6 +46,9 @@ export const Keyspace = () => {
     const { search } = useLocation();
 
     useDocumentTitle(`${name} (${clusterID})`);
+
+    const [showDeleteModal, setDeleteModal] = useState<boolean>(true);
+    const [deleteConfirm, setDeleteConfirm] = useState<string>('');
 
     const { data: keyspace, ...kq } = useKeyspace({ clusterID, name });
 
@@ -68,6 +77,11 @@ export const Keyspace = () => {
         );
     }
 
+    const deleteKeyspace = (e: any) => {
+        e.preventDefault();
+        console.log('deleting...!');
+    };
+
     return (
         <div>
             <WorkspaceHeader>
@@ -95,7 +109,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Add a shard</div>
+                                        <div className="text-gray-700">Add a shard</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Creates an empty shard.
                                         </div>
@@ -108,7 +122,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Validate keyspace</div>
+                                        <div className="text-gray-700">Validate keyspace</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Validates that all reachable nodes are consistent.
                                         </div>
@@ -119,7 +133,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Validate schema</div>
+                                        <div className="text-gray-700">Validate schema</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Validates that all tablets have the same schema as the primary tablet on
                                             shard 0.
@@ -131,7 +145,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Validate version</div>
+                                        <div className="text-gray-700">Validate version</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Validates that all tablets have the same version as the primary tablet on
                                             shard 0.
@@ -145,7 +159,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Rebuild keyspace graph</div>
+                                        <div className="text-gray-700">Rebuild keyspace graph</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Rebuilds the serving data for the keyspace.
                                         </div>
@@ -156,7 +170,7 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
-                                        <div className="">Reload schema in keyspace</div>
+                                        <div className="text-gray-700">Reload schema in keyspace</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Reloads the schema on all tablets.
                                         </div>
@@ -164,17 +178,17 @@ export const Keyspace = () => {
                                 </div>
 
                                 <div className="py-1" role="none">
-                                    <a
-                                        href="#"
-                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                    <button
+                                        type="button"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100 text-left"
+                                        onClick={() => setDeleteModal(true)}
                                         role="menuitem"
-                                        id="menu-item-2"
                                     >
                                         <div className=" text-red-600">Delete keyspace</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Recursively deletes the keyspace and all of its shards.
                                         </div>
-                                    </a>
+                                    </button>
                                 </div>
                             </>
                         </Dropdown>
@@ -203,6 +217,53 @@ export const Keyspace = () => {
                 {/* TODO skeleton placeholder */}
                 {!!kq.isLoading && <div className={style.placeholder}>Loading</div>}
             </ContentContainer>
+
+            <Modal
+                overlayClassName="z-50 bg-gray-600 bg-opacity-60 fixed top-0 left-0 right-0 bottom-0"
+                className="z-50 absolute top-1/3 left-1/2 transform -translate-x-1/2 sm:max-w-2xl sm:w-full"
+                isOpen={showDeleteModal}
+                onRequestClose={() => setDeleteModal(false)}
+            >
+                <div className="shadow-xl rounded-lg overflow-hidden">
+                    <div className="bg-white px-8 py-12">
+                        <h3>
+                            Delete <code>{keyspace?.keyspace?.name}</code>
+                        </h3>
+
+                        <div className="my-8">
+                            This will permanently delete the <code>{keyspace?.keyspace?.name}</code> keyspace.{' '}
+                            <span className="font-bold">This action cannot be undone.</span>
+                        </div>
+
+                        <div className="mt-8 mb-4">
+                            Please type <code className="font-bold">{keyspace?.keyspace?.name}</code> to continue:
+                        </div>
+
+                        <TextInput onChange={(e) => setDeleteConfirm(e.target.value)} value={deleteConfirm} />
+                    </div>
+
+                    <div className="bg-gray-50 px-8 py-8 flex flex-row-reverse">
+                        <button
+                            type="button"
+                            className={`font-bold font-sans w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-6 sm:w-auto ${
+                                deleteConfirm !== keyspace?.keyspace?.name
+                                    ? 'opacity-50 cursor-not-allowed hover:bg-red-600'
+                                    : ''
+                            }`}
+                            disabled={deleteConfirm !== keyspace?.keyspace?.name}
+                            onClick={deleteKeyspace}
+                        >
+                            Delete keyspace
+                        </button>
+                        <button
+                            type="button"
+                            className="font-bold font-sans mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-6 sm:w-auto"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
