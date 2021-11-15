@@ -13,6 +13,8 @@ import { WorkspaceTitle } from '../../layout/WorkspaceTitle';
 import { vtadmin as pb } from '../../../proto/vtadmin';
 import { TextInput } from '../../TextInput';
 import { Label } from '../../inputs/Label';
+import { useClusters, useKeyspaces } from '../../../hooks/api';
+import { Select } from '../../inputs/Select';
 
 interface FormState {
     clusterID: string;
@@ -49,6 +51,9 @@ const DEFAULT_FORM_STATE: FormState = {
 // // to create a SNAPSHOT keyspace.
 // vttime.Time snapshot_time = 9;
 export const CreateKeyspace = () => {
+    const { data: clusters = [], ...cq } = useClusters();
+    const { data: keyspaces = [], ...kq } = useKeyspaces();
+
     const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
 
     const history = useHistory();
@@ -78,6 +83,8 @@ export const CreateKeyspace = () => {
         mutation.mutate(req);
     };
 
+    const selectedCluster = clusters.find((c) => c.id === formState.clusterID);
+
     console.log(mutation);
 
     return (
@@ -92,6 +99,19 @@ export const CreateKeyspace = () => {
 
             <ContentContainer>
                 <form className="max-w-screen-sm" onSubmit={onSubmit}>
+                    <div className="grid grid-cols-3">
+                        <div className="col-span-2 mb-8">
+                            <Select
+                                itemToString={(cluster) => cluster?.name || ''}
+                                items={clusters}
+                                label="Cluster"
+                                onChange={(cluster) => updateFormState({ clusterID: cluster?.id })}
+                                placeholder="Cluster"
+                                renderItem={(cluster) => `${cluster?.name}`}
+                                selectedItem={selectedCluster}
+                            />
+                        </div>
+                    </div>
                     <div className="grid grid-cols-3">
                         <Label className="col-span-2" label="Keyspace name">
                             <TextInput onChange={(e) => updateFormState({ name: e.target.value })} />
