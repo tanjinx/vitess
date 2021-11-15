@@ -32,6 +32,8 @@ import { ShardLink } from '../../links/ShardLink';
 import { getShardSortRange } from '../../../util/keyspaces';
 import { Pip } from '../../pips/Pip';
 import { Tooltip } from '../../tooltip/Tooltip';
+import { Button } from '../../Button';
+import { Icons } from '../../Icon';
 
 interface Props {
     keyspace: pb.Keyspace | null | undefined;
@@ -150,15 +152,26 @@ export const KeyspaceShards = ({ keyspace }: Props) => {
 
     return (
         <div className={style.container}>
-            <DataFilter
-                autoFocus
-                onChange={(e) => updateFilter(e.target.value)}
-                onClear={() => updateFilter('')}
-                placeholder="Filter shards"
-                value={filter || ''}
-            />
+            {!tq.isLoading && data.length ? (
+                <>
+                    <DataFilter
+                        autoFocus
+                        onChange={(e) => updateFilter(e.target.value)}
+                        onClear={() => updateFilter('')}
+                        placeholder="Filter shards"
+                        value={filter || ''}
+                    />
 
-            <DataTable columns={TABLE_COLUMNS} data={data} renderRows={renderRows} />
+                    <DataTable columns={TABLE_COLUMNS} data={data} renderRows={renderRows} />
+                </>
+            ) : (
+                <div className="my-24 text-center">
+                    <div className="mb-12 text-secondary text-2xl">No shards in keyspace</div>
+                    <Button icon={Icons.add} secondary>
+                        Add a shard
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

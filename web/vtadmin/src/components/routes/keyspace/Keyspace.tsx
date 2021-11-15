@@ -95,6 +95,19 @@ export const Keyspace = () => {
                                         role="menuitem"
                                         id="menu-item-1"
                                     >
+                                        <div className="">Add a shard</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Creates an empty shard.
+                                        </div>
+                                    </a>
+                                </div>
+                                <div className="border-b border-grey-50 py-1" role="none">
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
                                         <div className="">Validate keyspace</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Validates that all reachable nodes are consistent.
