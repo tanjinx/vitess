@@ -300,3 +300,16 @@ export const fetchVTExplain = async <R extends pb.IVTExplainRequest>({ cluster, 
 
     return pb.VTExplainResponse.create(result);
 };
+
+export const createKeyspace = async (req: pb.ICreateKeyspaceRequest) => {
+    const { REACT_APP_VTADMIN_API_ADDRESS } = process.env;
+    const url = `${REACT_APP_VTADMIN_API_ADDRESS}/api/keyspace/${req.cluster_id}`;
+    const opts = vtfetchOpts();
+    const result = await global.fetch(url, {
+        ...opts,
+        body: JSON.stringify(req.options),
+        method: 'POST',
+    });
+
+    return result.json();
+};

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useQueries, useQuery, useQueryClient, UseQueryOptions, UseQueryResult } from 'react-query';
+import { useMutation, useQueries, useQuery, useQueryClient, UseQueryOptions, UseQueryResult } from 'react-query';
 import {
     fetchBackups,
     fetchClusters,
@@ -34,6 +34,7 @@ import {
     fetchWorkflow,
     fetchWorkflows,
     TabletDebugVarsResponse,
+    vtfetchOpts,
 } from '../api/http';
 import { vtadmin as pb } from '../proto/vtadmin';
 import { formatAlias } from '../util/tablets';
