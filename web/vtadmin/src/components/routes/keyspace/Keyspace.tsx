@@ -32,6 +32,9 @@ import { KeyspaceShards } from './KeyspaceShards';
 import Modal from 'react-modal';
 import { TextInput } from '../../TextInput';
 import { Button } from '../../Button';
+import { useMutation } from 'react-query';
+import { deleteKeyspace } from '../../../api/http';
+import { vtadmin as pb } from '../../../proto/vtadmin';
 
 Modal.setAppElement('#root');
 
@@ -51,6 +54,10 @@ export const Keyspace = () => {
     const [deleteConfirm, setDeleteConfirm] = useState<string>('');
 
     const { data: keyspace, ...kq } = useKeyspace({ clusterID, name });
+
+    const mutation = useMutation((req: pb.IDeleteKeyspaceRequest) => {
+        return deleteKeyspace(req);
+    });
 
     if (kq.error) {
         return (
@@ -77,9 +84,20 @@ export const Keyspace = () => {
         );
     }
 
-    const deleteKeyspace = (e: any) => {
+    const onDeleteKeyspace = (e: any) => {
         e.preventDefault();
         console.log('deleting...!');
+        const clusterID = keyspace?.cluster?.id;
+        const name = keyspace?.keyspace?.name;
+
+        if (!clusterID || !name) return;
+
+        mutation.mutate({
+            cluster_id: clusterID,
+            options: {
+                keyspace: name,
+            },
+        } as pb.IDeleteKeyspaceRequest);
     };
 
     return (
@@ -251,7 +269,7 @@ export const Keyspace = () => {
                                     : ''
                             }`}
                             disabled={deleteConfirm !== keyspace?.keyspace?.name}
-                            onClick={deleteKeyspace}
+                            onClick={onDeleteKeyspace}
                         >
                             Delete keyspace
                         </button>

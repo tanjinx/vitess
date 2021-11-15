@@ -22,6 +22,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/errors"
 
 	vtadminpb "vitess.io/vitess/go/vt/proto/vtadmin"
@@ -51,6 +52,10 @@ func CreateKeyspace(ctx context.Context, r Request, api *API) *JSONResponse {
 // DeleteKeyspace implements the http wrapper for DELETE /keyspace/{cluster_id}/{name}[?recursive=].
 func DeleteKeyspace(ctx context.Context, r Request, api *API) *JSONResponse {
 	vars := mux.Vars(r.Request)
+
+	log.Infof("DeleteKeyspace:")
+	log.Infof("%+v", vars)
+
 	recursive, err := r.ParseQueryParamAsBool("recursive", false)
 	if err != nil {
 		return NewJSONResponse(nil, err)

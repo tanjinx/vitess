@@ -313,3 +313,16 @@ export const createKeyspace = async (req: pb.ICreateKeyspaceRequest) => {
 
     return result.json();
 };
+
+export const deleteKeyspace = async (req: pb.IDeleteKeyspaceRequest) => {
+    const { REACT_APP_VTADMIN_API_ADDRESS } = process.env;
+    // DELETE /keyspace/{cluster_id}/{name}[?recursive=].
+    const url = `${REACT_APP_VTADMIN_API_ADDRESS}/api/keyspace/${req.cluster_id}/${req.options?.keyspace}?recursive=true`;
+    const opts = vtfetchOpts();
+    const result = await global.fetch(url, {
+        ...opts,
+        method: 'DELETE',
+    });
+
+    return result.json();
+};
