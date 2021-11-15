@@ -29,12 +29,15 @@ import { WorkspaceHeader } from '../layout/WorkspaceHeader';
 import { WorkspaceTitle } from '../layout/WorkspaceTitle';
 import { DataFilter } from '../dataTable/DataFilter';
 import { KeyspaceLink } from '../links/KeyspaceLink';
+import { Button } from '../Button';
+import { Icons } from '../Icon';
+import { Link } from 'react-router-dom';
 
 export const Keyspaces = () => {
     useDocumentTitle('Keyspaces');
     const { value: filter, updateValue: updateFilter } = useSyncedURLParam('filter');
 
-    const { data } = useKeyspaces();
+    const { data, ...kq } = useKeyspaces();
 
     const ksRows = React.useMemo(() => {
         const mapped = (data || []).map((k) => {
@@ -76,23 +79,47 @@ export const Keyspaces = () => {
                 </DataCell>
             </tr>
         ));
-
     return (
         <div>
             <WorkspaceHeader>
-                <WorkspaceTitle>Keyspaces</WorkspaceTitle>
+                <div className="flex justify-between max-w-screen-md">
+                    <WorkspaceTitle>Keyspaces</WorkspaceTitle>
+
+                    {(kq.isLoading || !!data?.length) && (
+                        <Link to="/keyspaces/create">
+                            <Button secondary icon={Icons.add}>
+                                New Keyspace
+                            </Button>
+                        </Link>
+                    )}
+                </div>
             </WorkspaceHeader>
             <ContentContainer>
-                <DataFilter
-                    autoFocus
-                    onChange={(e) => updateFilter(e.target.value)}
-                    onClear={() => updateFilter('')}
-                    placeholder="Filter keyspaces"
-                    value={filter || ''}
-                />
-                <div className="max-w-screen-md">
-                    <DataTable columns={['Keyspace', 'Shards']} data={ksRows} renderRows={renderRows} />
-                </div>
+                {!kq.isLoading && !data?.length ? (
+                    <div className="border border-dashed border-gray-300 text-center my-48 px-48 py-32 max-w-4xl mx-auto">
+                        <h3 className="text-secondary my-8">No keyspaces</h3>
+                        <Link to="/keyspaces/create">
+                            <Button icon={Icons.add} secondary>
+                                New Keyspace
+                            </Button>
+                        </Link>
+                    </div>
+                ) : kq.isLoading ? (
+                    <div>loading</div>
+                ) : (
+                    <>
+                        <DataFilter
+                            autoFocus
+                            onChange={(e) => updateFilter(e.target.value)}
+                            onClear={() => updateFilter('')}
+                            placeholder="Filter keyspaces"
+                            value={filter || ''}
+                        />
+                        <div className="max-w-screen-md">
+                            <DataTable columns={['Keyspace', 'Shards']} data={ksRows} renderRows={renderRows} />
+                        </div>
+                    </>
+                )}
             </ContentContainer>
         </div>
     );

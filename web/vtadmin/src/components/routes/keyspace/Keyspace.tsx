@@ -254,43 +254,48 @@ export const Keyspace = () => {
                 onRequestClose={() => setDeleteModal(false)}
             >
                 <div className="shadow-xl rounded-lg overflow-hidden">
-                    <div className="bg-white px-8 py-12">
-                        <h3>
-                            Delete <code>{keyspace?.keyspace?.name}</code>
-                        </h3>
+                    <form onSubmit={onDeleteKeyspace}>
+                        <div className="bg-white px-8 py-12">
+                            <h3>
+                                Delete <code>{keyspace?.keyspace?.name}</code>
+                            </h3>
 
-                        <div className="my-8">
-                            This will permanently delete the <code>{keyspace?.keyspace?.name}</code> keyspace.{' '}
-                            <span className="font-bold">This action cannot be undone.</span>
+                            <div className="my-8">
+                                This will permanently delete the <code>{keyspace?.keyspace?.name}</code> keyspace.{' '}
+                                <span className="font-bold">This action cannot be undone.</span>
+                            </div>
+
+                            <div className="mt-8 mb-4">
+                                Please type <code className="font-bold">{keyspace?.keyspace?.name}</code> to continue:
+                            </div>
+
+                            <TextInput
+                                autoFocus
+                                onChange={(e) => setDeleteConfirm(e.target.value)}
+                                value={deleteConfirm}
+                            />
                         </div>
 
-                        <div className="mt-8 mb-4">
-                            Please type <code className="font-bold">{keyspace?.keyspace?.name}</code> to continue:
+                        <div className="bg-gray-50 px-8 py-8 flex flex-row-reverse">
+                            <button
+                                type="submit"
+                                className={`font-bold font-sans w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-6 sm:w-auto ${
+                                    deleteConfirm !== keyspace?.keyspace?.name
+                                        ? 'opacity-50 cursor-not-allowed hover:bg-red-600'
+                                        : ''
+                                }`}
+                                disabled={deleteConfirm !== keyspace?.keyspace?.name}
+                            >
+                                Delete keyspace
+                            </button>
+                            <button
+                                type="button"
+                                className="font-bold font-sans mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-6 sm:w-auto"
+                            >
+                                Cancel
+                            </button>
                         </div>
-
-                        <TextInput onChange={(e) => setDeleteConfirm(e.target.value)} value={deleteConfirm} />
-                    </div>
-
-                    <div className="bg-gray-50 px-8 py-8 flex flex-row-reverse">
-                        <button
-                            type="button"
-                            className={`font-bold font-sans w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-6 sm:w-auto ${
-                                deleteConfirm !== keyspace?.keyspace?.name
-                                    ? 'opacity-50 cursor-not-allowed hover:bg-red-600'
-                                    : ''
-                            }`}
-                            disabled={deleteConfirm !== keyspace?.keyspace?.name}
-                            onClick={onDeleteKeyspace}
-                        >
-                            Delete keyspace
-                        </button>
-                        <button
-                            type="button"
-                            className="font-bold font-sans mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-6 py-3 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-6 sm:w-auto"
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                    </form>
                 </div>
             </Modal>
         </div>

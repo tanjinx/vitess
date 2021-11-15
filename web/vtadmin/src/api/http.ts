@@ -103,7 +103,7 @@ export const vtfetchEntities = async <T>(opts: {
 }): Promise<T[]> => {
     const res = await vtfetch(opts.endpoint);
 
-    const entities = opts.extract(res);
+    const entities = opts.extract(res) || [];
     if (!Array.isArray(entities)) {
         // Since react-query is the downstream consumer of vtfetch + vtfetchEntities,
         // errors thrown in either function will be "handled" and will not automatically
