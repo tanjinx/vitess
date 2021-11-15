@@ -1,5 +1,5 @@
 import { FormEventHandler, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const DEFAULT_FORM_STATE: FormState = {
 
 export const CreateKeyspace = () => {
     const { data: clusters = [], ...cq } = useClusters();
-
+    const queryClient = useQueryClient();
     const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
 
     const history = useHistory();
@@ -45,6 +45,7 @@ export const CreateKeyspace = () => {
 
     const mutation = useMutation<any, any, any>((req) => createKeyspace(req), {
         onSuccess: (data) => {
+            queryClient.invalidateQueries('keyspaces');
             history.push(`/keyspace/${data.result.keyspace.cluster.id}/${data.result.keyspace.keyspace.name}`);
         },
     });

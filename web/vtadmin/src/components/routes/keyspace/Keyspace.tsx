@@ -16,6 +16,7 @@
 import { useState } from 'react';
 import { Switch, useLocation, useParams, useRouteMatch } from 'react-router';
 import { Link, Redirect, Route } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 import { useKeyspace } from '../../../hooks/api';
 import { useDocumentTitle } from '../../../hooks/useDocumentTitle';
@@ -32,7 +33,7 @@ import { KeyspaceShards } from './KeyspaceShards';
 import Modal from 'react-modal';
 import { TextInput } from '../../TextInput';
 import { Button } from '../../Button';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { deleteKeyspace } from '../../../api/http';
 import { vtadmin as pb } from '../../../proto/vtadmin';
 
@@ -47,17 +48,27 @@ export const Keyspace = () => {
     const { clusterID, name } = useParams<RouteParams>();
     const { path, url } = useRouteMatch();
     const { search } = useLocation();
+    const history = useHistory();
+    const queryClient = useQueryClient();
 
     useDocumentTitle(`${name} (${clusterID})`);
 
-    const [showDeleteModal, setDeleteModal] = useState<boolean>(true);
+    const [showDeleteModal, setDeleteModal] = useState<boolean>(false);
     const [deleteConfirm, setDeleteConfirm] = useState<string>('');
 
     const { data: keyspace, ...kq } = useKeyspace({ clusterID, name });
 
-    const mutation = useMutation((req: pb.IDeleteKeyspaceRequest) => {
-        return deleteKeyspace(req);
-    });
+    const mutation = useMutation(
+        (req: pb.IDeleteKeyspaceRequest) => {
+            return deleteKeyspace(req);
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries('keyspaces');
+                history.push(`/keyspaces`);
+            },
+        }
+    );
 
     if (kq.error) {
         return (
