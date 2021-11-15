@@ -19,6 +19,7 @@ import { Link, Redirect, Route } from 'react-router-dom';
 import { useKeyspace } from '../../../hooks/api';
 import { useDocumentTitle } from '../../../hooks/useDocumentTitle';
 import { Code } from '../../Code';
+import { Dropdown } from '../../Dropdown';
 import { ContentContainer } from '../../layout/ContentContainer';
 import { NavCrumbs } from '../../layout/NavCrumbs';
 import { WorkspaceHeader } from '../../layout/WorkspaceHeader';
@@ -74,12 +75,97 @@ export const Keyspace = () => {
                     <Link to="/keyspaces">Keyspaces</Link>
                 </NavCrumbs>
 
-                <WorkspaceTitle className="font-mono">{name}</WorkspaceTitle>
+                <div className="flex justify-between max-w-screen-xl">
+                    <div className="flex-1">
+                        <WorkspaceTitle className="font-mono">{name}</WorkspaceTitle>
 
-                <div className={style.headingMeta}>
-                    <span>
-                        Cluster: <code>{clusterID}</code>
-                    </span>
+                        <div className={style.headingMeta}>
+                            <span>
+                                Cluster: <code>{clusterID}</code>
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <Dropdown label="Actions">
+                            <>
+                                <div className="border-b border-grey-50 py-1" role="none">
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
+                                        <div className="">Validate keyspace</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Validates that all reachable nodes are consistent.
+                                        </div>
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
+                                        <div className="">Validate schema</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Validates that all tablets have the same schema as the primary tablet on
+                                            shard 0.
+                                        </div>
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
+                                        <div className="">Validate version</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Validates that all tablets have the same version as the primary tablet on
+                                            shard 0.
+                                        </div>
+                                    </a>
+                                </div>
+                                <div className="border-b border-grey-50 py-1" role="none">
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
+                                        <div className="">Rebuild keyspace graph</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Rebuilds the serving data for the keyspace.
+                                        </div>
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-1"
+                                    >
+                                        <div className="">Reload schema in keyspace</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Reloads the schema on all tablets.
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div className="py-1" role="none">
+                                    <a
+                                        href="#"
+                                        className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
+                                        role="menuitem"
+                                        id="menu-item-2"
+                                    >
+                                        <div className=" text-red-600">Delete keyspace</div>
+                                        <div className="font-size-small text-secondary mt-1">
+                                            Recursively deletes the keyspace and all of its shards.
+                                        </div>
+                                    </a>
+                                </div>
+                            </>
+                        </Dropdown>
+                    </div>
                 </div>
             </WorkspaceHeader>
 
