@@ -34,6 +34,7 @@ import { Pip } from '../../pips/Pip';
 import { Tooltip } from '../../tooltip/Tooltip';
 import { Button } from '../../Button';
 import { Icons } from '../../Icon';
+import { Link } from 'react-router-dom';
 
 interface Props {
     keyspace: pb.Keyspace | null | undefined;
@@ -167,9 +168,11 @@ export const KeyspaceShards = ({ keyspace }: Props) => {
             ) : (
                 <div className="my-24 text-center">
                     <div className="mb-12 text-secondary text-2xl">No shards in keyspace</div>
-                    <Button icon={Icons.add} secondary>
-                        Add a shard
-                    </Button>
+                    <Link to={`/keyspace/${keyspace.cluster?.id}/${keyspace.keyspace?.name}/shards/new`}>
+                        <Button icon={Icons.add} secondary>
+                            Add shards
+                        </Button>
+                    </Link>
                 </div>
             )}
         </div>

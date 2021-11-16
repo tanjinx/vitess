@@ -232,7 +232,7 @@ export const Keyspace = () => {
                 </TabContainer>
 
                 <Switch>
-                    <Route path={`${path}/shards`}>
+                    <Route exact path={`${path}/shards`}>
                         <KeyspaceShards keyspace={keyspace} />
                     </Route>
 

@@ -37,6 +37,7 @@ import { Shard } from './routes/shard/Shard';
 import { Vtctlds } from './routes/Vtctlds';
 import { CreateKeyspace } from './routes/createKeyspace/CreateKeyspace';
 import { Icon, Icons } from './Icon';
+import { CreateShards } from './routes/createShards/CreateShards';
 
 export const App = () => {
     return (
@@ -75,6 +76,10 @@ export const App = () => {
 
                         <Route path="/keyspaces">
                             <Keyspaces />
+                        </Route>
+
+                        <Route exact path="/keyspace/:clusterID/:keyspace/shards/new">
+                            <CreateShards />
                         </Route>
 
                         <Route path="/keyspace/:clusterID/:keyspace/shard/:shard">
