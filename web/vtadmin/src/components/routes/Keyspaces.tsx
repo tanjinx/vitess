@@ -77,12 +77,28 @@ export const Keyspaces = () => {
                         </div>
                     )}
                 </DataCell>
+                <td className="text-right">
+                    <button
+                        className="mr-3 font-medium border border-gray-400 rounded-lg font-sans font-size-small px-3 py-1 text-gray-400 hover:border-blue-600 hover:text-blue-700"
+                        type="button"
+                    >
+                        ...
+                    </button>
+                    <KeyspaceLink clusterID={row.clusterID} name={row.name}>
+                        <button
+                            className="font-medium border border-gray-400 rounded-lg font-sans font-size-small px-3 py-1 text-gray-400 hover:border-blue-600 hover:text-blue-700"
+                            type="button"
+                        >
+                            View keyspace
+                        </button>
+                    </KeyspaceLink>
+                </td>
             </tr>
         ));
     return (
         <div>
             <WorkspaceHeader>
-                <div className="flex justify-between max-w-screen-md">
+                <div className="flex justify-between max-w-screen-lg">
                     <WorkspaceTitle>Keyspaces</WorkspaceTitle>
 
                     {(kq.isLoading || !!data?.length) && (
@@ -115,9 +131,9 @@ export const Keyspaces = () => {
                             placeholder="Filter keyspaces"
                             value={filter || ''}
                         />
-                        <div className="max-w-screen-md">
+                        <div className="max-w-screen-lg">
                             <DataTable
-                                columns={['Keyspace', 'Cluster', 'Shards']}
+                                columns={['Keyspace', 'Cluster', 'Shards', '']}
                                 data={ksRows}
                                 renderRows={renderRows}
                             />
