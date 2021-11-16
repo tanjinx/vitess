@@ -1,5 +1,5 @@
 import { FormEventHandler, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { useKeyspace } from '../../../hooks/api';
 import { Button } from '../../Button';
 import { Label } from '../../inputs/Label';
@@ -8,6 +8,9 @@ import { NavCrumbs } from '../../layout/NavCrumbs';
 import { WorkspaceHeader } from '../../layout/WorkspaceHeader';
 import { WorkspaceTitle } from '../../layout/WorkspaceTitle';
 import { TextInput } from '../../TextInput';
+import { vtadmin as pb } from '../../../proto/vtadmin';
+import { useMutation, useQueryClient } from 'react-query';
+import { createShard } from '../../../api/http';
 
 interface RouteParams {
     clusterID: string;
@@ -23,12 +26,37 @@ interface FormState {
     shards: ShardRange[];
 }
 
+const formatShardRanges = (count: number): ShardRange[] => {
+    const maxShards = 256;
+    const size = maxShards / count;
+
+    let start = 0;
+    let end = 0;
+    let realEnd = 0;
+
+    const shards: ShardRange[] = [];
+
+    for (let i = 1; i <= count; i++) {
+        realEnd = i * size;
+        end = Math.round(realEnd);
+        shards.push({
+            start: start === 0 ? '' : start.toString(16),
+            end: end === maxShards ? '' : end.toString(16),
+        });
+        start = end;
+    }
+
+    return shards;
+};
+
 const DEFAULT_FORM_DATA: FormState = {
-    shardCount: '',
-    shards: [],
+    shardCount: '4',
+    shards: formatShardRanges(4),
 };
 
 export const CreateShards = () => {
+    const history = useHistory();
+    const queryClient = useQueryClient();
     const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_DATA);
     const params = useParams<RouteParams>();
     const { data: keyspace, ...kq } = useKeyspace({ clusterID: params.clusterID, name: params.keyspace });
@@ -51,8 +79,32 @@ export const CreateShards = () => {
         });
     };
 
+    const mutation = useMutation<any, any, FormState>(
+        (fs) => {
+            console.log(fs);
+            return Promise.all(
+                fs.shards.map((s) => {
+                    return createShard({
+                        cluster_id: keyspace?.cluster?.id,
+                        options: {
+                            keyspace: keyspace?.keyspace?.name,
+                            shard_name: `${s.start}-${s.end}`,
+                        },
+                    });
+                })
+            );
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries('keyspaces');
+                history.push(`/keyspace/${params.clusterID}/${params.keyspace}`);
+            },
+        }
+    );
+
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
+        mutation.mutate(formState);
     };
 
     return (
@@ -100,27 +152,4 @@ export const CreateShards = () => {
             </ContentContainer>
         </div>
     );
-};
-
-const formatShardRanges = (count: number): ShardRange[] => {
-    const maxShards = 256;
-    const size = maxShards / count;
-
-    let start = 0;
-    let end = 0;
-    let realEnd = 0;
-
-    const shards: ShardRange[] = [];
-
-    for (let i = 1; i <= count; i++) {
-        realEnd = i * size;
-        end = Math.round(realEnd);
-        shards.push({
-            start: start === 0 ? '' : start.toString(16),
-            end: end === maxShards ? '' : end.toString(16),
-        });
-        start = end;
-    }
-
-    return shards;
 };

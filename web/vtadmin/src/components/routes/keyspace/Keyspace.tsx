@@ -133,12 +133,12 @@ export const Keyspace = () => {
                             <>
                                 <div className="border-b border-grey-50 py-1" role="none">
                                     <Link
-                                        to={`/keyspace/${clusterID}/name/shards/new`}
+                                        to={`/keyspace/${clusterID}/${name}/shards/new`}
                                         className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
                                     >
-                                        <div className="text-gray-700">Add a shard</div>
+                                        <div className="text-gray-700">Create shards</div>
                                         <div className="font-size-small text-secondary mt-1">
-                                            Creates an empty shard.
+                                            Creates empty shards in the keyspace.
                                         </div>
                                     </Link>
                                 </div>

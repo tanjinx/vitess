@@ -326,3 +326,16 @@ export const deleteKeyspace = async (req: pb.IDeleteKeyspaceRequest) => {
 
     return result.json();
 };
+
+export const createShard = async (req: pb.ICreateShardRequest) => {
+    const { REACT_APP_VTADMIN_API_ADDRESS } = process.env;
+    const url = `${REACT_APP_VTADMIN_API_ADDRESS}/api/shards/${req.cluster_id}`;
+    const opts = vtfetchOpts();
+    const result = await global.fetch(url, {
+        ...opts,
+        body: JSON.stringify(req.options),
+        method: 'POST',
+    });
+
+    return result.json();
+};
