@@ -75,7 +75,7 @@
     --colorPrimary200: #0031ca;
     --colorScaffoldingHighlight: var(--grey400);
     --colorScaffoldingForeground: var(--grey600);
-    --tableBorderColor: var(--grey400);
+    --tableBorderColor: var(--grey200);
     --textColorPrimary: theme('textColor.primary');
     --textColorInverted: #fff;
     --textColorSecondary: theme('textColor.secondary');

@@ -61,9 +61,9 @@ export const Keyspaces = () => {
                 <DataCell>
                     <KeyspaceLink clusterID={row.clusterID} name={row.name}>
                         <div className="font-bold">{row.name}</div>
-                        <div className="font-size-small text-secondary">{row.cluster}</div>
                     </KeyspaceLink>
                 </DataCell>
+                <DataCell>{row.cluster}</DataCell>
                 <DataCell>
                     {!!row.servingShards && (
                         <div>
@@ -116,7 +116,11 @@ export const Keyspaces = () => {
                             value={filter || ''}
                         />
                         <div className="max-w-screen-md">
-                            <DataTable columns={['Keyspace', 'Shards']} data={ksRows} renderRows={renderRows} />
+                            <DataTable
+                                columns={['Keyspace', 'Cluster', 'Shards']}
+                                data={ksRows}
+                                renderRows={renderRows}
+                            />
                         </div>
                     </>
                 )}
