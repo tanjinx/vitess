@@ -14,12 +14,18 @@ interface RouteParams {
     keyspace: string;
 }
 
+interface ShardRange {
+    start: string; // hex string
+    end: string; // hex string
+}
 interface FormState {
-    shardCount: number;
+    shardCount: string;
+    shards: ShardRange[];
 }
 
 const DEFAULT_FORM_DATA: FormState = {
-    shardCount: 0,
+    shardCount: '',
+    shards: [],
 };
 
 export const CreateShards = () => {
@@ -32,6 +38,18 @@ export const CreateShards = () => {
             ...formState,
             ...nextState,
         });
+
+    const onUpdateCount: React.ChangeEventHandler<any> = (e) => {
+        const count = parseInt(e.target.value);
+        const shards = formatShardRanges(count);
+        console.log(shards);
+
+        updateFormState({
+            // use the string representation so we don't overwrite with NaN
+            shardCount: e.target.value,
+            shards,
+        });
+    };
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -46,17 +64,30 @@ export const CreateShards = () => {
                     <Link to="/keyspaces">{params.keyspace}</Link>
                 </NavCrumbs>
 
-                <WorkspaceTitle>Create shards</WorkspaceTitle>
+                <WorkspaceTitle className="mt-4">
+                    Create shards in <code>{params.keyspace}</code>
+                </WorkspaceTitle>
             </WorkspaceHeader>
             <ContentContainer>
                 <form className="max-w-screen-sm" onSubmit={onSubmit}>
                     <div className="inline-grid grid-cols-3">
                         <Label label="Number of shards to create">
-                            <TextInput
-                                onChange={(e) => updateFormState({ shardCount: parseInt(e.target.value) })}
-                                value={formState.shardCount}
-                            />
+                            <TextInput onChange={onUpdateCount} value={formState.shardCount} />
                         </Label>
+                    </div>
+
+                    <div className="font-bold mt-16 mb-8">Shards</div>
+                    <div className="inline-grid grid-cols-4 gap-4">
+                        {formState.shards.map((s, sdx) => (
+                            <div key={sdx}>
+                                <input
+                                    type="text"
+                                    className="border-2 rounded-lg font-mono px-6 py-4 w-full"
+                                    readOnly
+                                    value={`${s.start}-${s.end}`}
+                                />
+                            </div>
+                        ))}
                     </div>
 
                     <div className="my-12">
@@ -69,4 +100,27 @@ export const CreateShards = () => {
             </ContentContainer>
         </div>
     );
+};
+
+const formatShardRanges = (count: number): ShardRange[] => {
+    const maxShards = 256;
+    const size = maxShards / count;
+
+    let start = 0;
+    let end = 0;
+    let realEnd = 0;
+
+    const shards: ShardRange[] = [];
+
+    for (let i = 1; i <= count; i++) {
+        realEnd = i * size;
+        end = Math.round(realEnd);
+        shards.push({
+            start: start.toString(16),
+            end: end.toString(16),
+        });
+        start = end;
+    }
+
+    return shards;
 };
