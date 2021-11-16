@@ -76,7 +76,7 @@ export const CreateShards = () => {
                         </Label>
                     </div>
 
-                    <div className="font-bold mt-16 mb-8">Shards</div>
+                    <div className="font-bold mt-12 mb-8">Shards</div>
                     <div className="inline-grid grid-cols-4 gap-4">
                         {formState.shards.map((s, sdx) => (
                             <div key={sdx}>
@@ -90,7 +90,7 @@ export const CreateShards = () => {
                         ))}
                     </div>
 
-                    <div className="my-12">
+                    <div className="my-16">
                         <Button type="submit">Create shards</Button>
                         <Button className="ml-4" secondary type="submit">
                             Reset
