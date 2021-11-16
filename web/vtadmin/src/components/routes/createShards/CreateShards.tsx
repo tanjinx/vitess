@@ -116,8 +116,8 @@ const formatShardRanges = (count: number): ShardRange[] => {
         realEnd = i * size;
         end = Math.round(realEnd);
         shards.push({
-            start: start.toString(16),
-            end: end.toString(16),
+            start: start === 0 ? '' : start.toString(16),
+            end: end === maxShards ? '' : end.toString(16),
         });
         start = end;
     }
