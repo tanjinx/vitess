@@ -132,17 +132,15 @@ export const Keyspace = () => {
                         <Dropdown label="Actions">
                             <>
                                 <div className="border-b border-grey-50 py-1" role="none">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to={`/keyspace/${clusterID}/name/shards/new`}
                                         className="text-gray-700 block px-8 py-4 hover:bg-gray-100"
-                                        role="menuitem"
-                                        id="menu-item-1"
                                     >
                                         <div className="text-gray-700">Add a shard</div>
                                         <div className="font-size-small text-secondary mt-1">
                                             Creates an empty shard.
                                         </div>
-                                    </a>
+                                    </Link>
                                 </div>
                                 <div className="border-b border-grey-50 py-1" role="none">
                                     <a
