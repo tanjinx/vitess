@@ -36,6 +36,7 @@ import { Backups } from './routes/Backups';
 import { Shard } from './routes/shard/Shard';
 import { Vtctlds } from './routes/Vtctlds';
 import { CreateKeyspace } from './routes/createKeyspace/CreateKeyspace';
+import { Icon, Icons } from './Icon';
 
 export const App = () => {
     return (
@@ -46,6 +47,15 @@ export const App = () => {
                 </div>
 
                 <div className={style.mainContainer}>
+                    <div className="px-10 pt-4 pb-6 border-b border-gray-100 shadow-sm">
+                        <div className="text-secondary text-1xl border-gray-200 border rounded max-w-6xl px-6 py-4 bg-gray-50">
+                            <Icon className="fill-current inline-block mr-3 text-gray-400" icon={Icons.search} /> Search
+                            for anything
+                            <div className="bg-white border border-gray-200 text-lg px-4 py-2 ml-4 inline rounded-md">
+                                ⌘K
+                            </div>
+                        </div>
+                    </div>
                     <Switch>
                         <Route path="/backups">
                             <Backups />
