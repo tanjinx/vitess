@@ -113,7 +113,10 @@ export const CreateKeyspace = () => {
         if (formState.nameDirty || !formState.baseKeyspace) {
             updateFormState({ snapshotTime: e.target.value });
         } else {
-            const d = new Sugar.Date(e.target.value);
+            const d = isNaN(parseInt(e.target.value))
+                ? new Sugar.Date(e.target.value)
+                : new Sugar.Date(parseInt(e.target.value));
+
             let ds = d.isValid().raw ? d.format('{x}').raw : '';
             updateFormState({
                 baseKeyspace: baseKeyspace?.keyspace?.name || '',
