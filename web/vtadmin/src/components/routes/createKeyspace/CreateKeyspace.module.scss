@@ -1,0 +1,50 @@
+.radio {
+    @apply border border-gray-300 rounded-lg;
+    cursor: pointer;
+    padding: 18px 18px 18px 16px;
+    position: relative;
+}
+
+.radio:hover {
+    border-color: var(--colorPrimary);
+}
+
+.radio.active {
+    border-color: var(--colorPrimary);
+    background: rgba(182, 183, 255, 0.1);
+}
+
+// Outer
+.radio::before {
+    background: transparent;
+    border: solid 1px rgba(209, 213, 219, var(--tw-border-opacity));
+    border-radius: 100px;
+    content: '';
+    display: block;
+    height: 16px;
+    width: 16px;
+    position: absolute;
+    top: 20px;
+    left: 14px;
+}
+
+.radio.active::before {
+    border-color: var(--colorPrimary);
+}
+
+// Inner
+.radio.active::after {
+    background: var(--colorPrimary);
+    border-radius: 100px;
+    content: '';
+    display: block;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    top: 24px;
+    left: 18px;
+}
+
+.radio input[type='radio'] {
+    visibility: hidden;
+}
