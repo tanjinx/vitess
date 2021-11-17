@@ -31,7 +31,7 @@ interface FormState {
 const DEFAULT_FORM_STATE: FormState = {
     baseKeyspace: '',
     clusterID: 'local',
-    keyspaceType: topodata.KeyspaceType.SNAPSHOT,
+    keyspaceType: topodata.KeyspaceType.NORMAL,
     name: '',
     snapshotTime: '',
     nameDirty: false,
@@ -87,7 +87,10 @@ export const CreateKeyspace = () => {
 
     let sugarDate = null;
     if (formState.snapshotTime) {
-        const d = new Sugar.Date(formState.snapshotTime);
+        const d = isNaN(parseInt(formState.snapshotTime))
+            ? new Sugar.Date(formState.snapshotTime)
+            : new Sugar.Date(parseInt(formState.snapshotTime));
+
         if (d.isValid().raw) {
             sugarDate = `${d.long().raw} ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${d.relative().raw})`;
         }
@@ -101,20 +104,20 @@ export const CreateKeyspace = () => {
             let ds = d.isValid().raw ? d.toUTCString().raw : '';
             updateFormState({
                 baseKeyspace: ks?.keyspace?.name || '',
-                name: `__${ks?.keyspace?.name}_SNAPSHOT${ds}`,
+                name: `${ks?.keyspace?.name}SNAPSHOT${ds}`,
             });
         }
     };
 
     const onChangeTime = (e: any) => {
-        if (formState.nameDirty) {
+        if (formState.nameDirty || !formState.baseKeyspace) {
             updateFormState({ snapshotTime: e.target.value });
         } else {
             const d = new Sugar.Date(e.target.value);
             let ds = d.isValid().raw ? d.format('{x}').raw : '';
             updateFormState({
                 baseKeyspace: baseKeyspace?.keyspace?.name || '',
-                name: `__${baseKeyspace?.keyspace?.name}_SNAPSHOT_${ds}`,
+                name: `${baseKeyspace?.keyspace?.name}SNAPSHOT${ds}`,
                 snapshotTime: e.target.value,
             });
         }
