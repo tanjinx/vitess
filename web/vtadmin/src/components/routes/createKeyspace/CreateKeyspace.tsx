@@ -18,6 +18,7 @@ import { TextInput } from '../../TextInput';
 import { Label } from '../../inputs/Label';
 import { useClusters, useKeyspaces } from '../../../hooks/api';
 import { Select } from '../../inputs/Select';
+import Long from 'long';
 
 interface FormState {
     baseKeyspace: string;
@@ -76,12 +77,30 @@ export const CreateKeyspace = () => {
             return;
         }
 
-        const req: pb.ICreateKeyspaceRequest = {
+        let req: pb.ICreateKeyspaceRequest = {
             cluster_id: formState.clusterID,
             options: {
                 name: formState.name,
             },
         };
+
+        if (formState.keyspaceType === topodata.KeyspaceType.SNAPSHOT) {
+            const d = isNaN(parseInt(formState.snapshotTime))
+                ? new Sugar.Date(formState.snapshotTime)
+                : new Sugar.Date(parseInt(formState.snapshotTime));
+
+            req = {
+                cluster_id: formState.clusterID,
+                options: {
+                    base_keyspace: formState.baseKeyspace,
+                    name: formState.name,
+                    snapshot_time: {
+                        seconds: parseInt(d.toUTCString().raw),
+                    },
+                },
+            };
+        }
+
         mutation.mutate(req);
     };
 
