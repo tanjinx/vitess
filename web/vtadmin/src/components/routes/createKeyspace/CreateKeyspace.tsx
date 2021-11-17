@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
+import Sugar from 'sugar';
 
 import style from './CreateKeyspace.module.scss';
 import { createKeyspace } from '../../../api/http';
@@ -19,19 +20,27 @@ import { useClusters, useKeyspaces } from '../../../hooks/api';
 import { Select } from '../../inputs/Select';
 
 interface FormState {
+    baseKeyspace: string;
     clusterID: string;
     keyspaceType: topodata.KeyspaceType;
     name: string;
+    snapshotTime: string;
+    nameDirty: boolean;
 }
 
 const DEFAULT_FORM_STATE: FormState = {
+    baseKeyspace: '',
     clusterID: 'local',
-    keyspaceType: topodata.KeyspaceType.NORMAL,
+    keyspaceType: topodata.KeyspaceType.SNAPSHOT,
     name: '',
+    snapshotTime: '',
+    nameDirty: false,
 };
 
 export const CreateKeyspace = () => {
     const { data: clusters = [], ...cq } = useClusters();
+    const { data: keyspaces = [], ...kq } = useKeyspaces();
+
     const queryClient = useQueryClient();
     const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
 
@@ -46,6 +55,10 @@ export const CreateKeyspace = () => {
     useDocumentTitle('Create Keyspace');
 
     const selectedCluster = clusters.find((c) => c.id === formState.clusterID);
+    const clusterKeyspaces = keyspaces.filter((k) => k.cluster?.id === selectedCluster?.id);
+    const baseKeyspace = keyspaces.find(
+        (k) => k.cluster?.id === selectedCluster?.id && k.keyspace?.name === formState.baseKeyspace
+    );
 
     const mutation = useMutation<any, any, any>((req) => createKeyspace(req), {
         onSuccess: (data) => {
@@ -72,6 +85,41 @@ export const CreateKeyspace = () => {
         mutation.mutate(req);
     };
 
+    let sugarDate = null;
+    if (formState.snapshotTime) {
+        const d = new Sugar.Date(formState.snapshotTime);
+        if (d.isValid().raw) {
+            sugarDate = `${d.long().raw} ${Intl.DateTimeFormat().resolvedOptions().timeZone} (${d.relative().raw})`;
+        }
+    }
+
+    const onChangeBaseKeyspace = (ks: any) => {
+        if (formState.nameDirty) {
+            updateFormState({ baseKeyspace: ks?.keyspace?.name || '' });
+        } else {
+            const d = new Sugar.Date(formState.snapshotTime);
+            let ds = d.isValid().raw ? d.toUTCString().raw : '';
+            updateFormState({
+                baseKeyspace: ks?.keyspace?.name || '',
+                name: `__${ks?.keyspace?.name}_SNAPSHOT${ds}`,
+            });
+        }
+    };
+
+    const onChangeTime = (e: any) => {
+        if (formState.nameDirty) {
+            updateFormState({ snapshotTime: e.target.value });
+        } else {
+            const d = new Sugar.Date(e.target.value);
+            let ds = d.isValid().raw ? d.format('{x}').raw : '';
+            updateFormState({
+                baseKeyspace: baseKeyspace?.keyspace?.name || '',
+                name: `__${baseKeyspace?.keyspace?.name}_SNAPSHOT_${ds}`,
+                snapshotTime: e.target.value,
+            });
+        }
+    };
+
     return (
         <div>
             <WorkspaceHeader>
@@ -84,9 +132,9 @@ export const CreateKeyspace = () => {
 
             <ContentContainer>
                 <form className="max-w-screen-sm" onSubmit={onSubmit}>
-                    <div className="mb-8">
+                    <div className="">
                         <div className="font-bold mb-4">Keyspace type</div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-6">
                             <label
                                 className={cx(
                                     style.radio,
@@ -131,8 +179,8 @@ export const CreateKeyspace = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3">
-                        <div className="col-span-2 mb-8">
+                    <div className="grid grid-cols-3 my-8">
+                        <div className="col-span-2">
                             <Select
                                 itemToString={(cluster) => cluster?.name || ''}
                                 items={clusters}
@@ -144,17 +192,53 @@ export const CreateKeyspace = () => {
                             />
                         </div>
                     </div>
-                    <div className="grid grid-cols-3">
+
+                    {formState.keyspaceType === topodata.KeyspaceType.SNAPSHOT && (
+                        <>
+                            <div className="grid grid-cols-3 my-8">
+                                <div className="col-span-2">
+                                    <Select
+                                        itemToString={(ks) => ks?.keyspace?.name || ''}
+                                        items={clusterKeyspaces}
+                                        label="Base keyspace"
+                                        selectedItem={baseKeyspace}
+                                        placeholder=""
+                                        renderItem={(ks) => `${ks?.keyspace?.name}`}
+                                        onChange={onChangeBaseKeyspace}
+                                    />
+                                    <p className="font-size-small text-gray-500 mb-0 mt-2 block">
+                                        The snapshot keyspace will be created from the base keyspace at the given point
+                                        in time.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 my-8">
+                                <Label className="col-span-2" label="Snapshot time">
+                                    <TextInput onChange={onChangeTime} value={formState.snapshotTime} />
+                                    {typeof formState.snapshotTime === 'string' && (
+                                        <p className="font-size-small text-gray-500 mb-0 mt-2 block">{sugarDate}</p>
+                                    )}
+                                </Label>
+                            </div>
+                        </>
+                    )}
+
+                    <div className="grid grid-cols-3 my-8">
                         <Label className="col-span-2" label="Keyspace name">
                             <TextInput
-                                onChange={(e) => updateFormState({ name: e.target.value })}
+                                onChange={(e) => updateFormState({ name: e.target.value, nameDirty: true })}
                                 value={formState.name}
                             />
                         </Label>
                     </div>
-                    <div className="my-12">
+
+                    <div className="my-12 inline-grid gap-3 grid-cols-2">
                         <Button disabled={isDisabled} type="submit">
-                            Create
+                            Create Keyspace
+                        </Button>
+                        <Button onClick={() => setFormState(DEFAULT_FORM_STATE)} secondary>
+                            Start Over
                         </Button>
                     </div>
                 </form>

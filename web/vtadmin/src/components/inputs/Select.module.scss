@@ -16,6 +16,7 @@
 .container {
     display: inline-block;
     position: relative;
+    width: 100%;
 }
 
 .toggle {
@@ -35,6 +36,7 @@
     text-align: left;
     transition: all 0.1s ease-in-out;
     white-space: nowrap;
+    width: 100%;
 }
 
 .placeholder .toggle {
