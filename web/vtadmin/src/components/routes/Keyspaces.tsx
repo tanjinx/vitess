@@ -65,6 +65,7 @@ export const Keyspaces = () => {
                 </DataCell>
                 <DataCell>{row.cluster}</DataCell>
                 <DataCell>
+                    {!row.servingShards && !row.nonservingShards && <div className="text-secondary">0 shards</div>}
                     {!!row.servingShards && (
                         <div>
                             <Pip state="success" /> {row.servingShards} {row.servingShards === 1 ? 'shard' : 'shards'}
