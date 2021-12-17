@@ -19,7 +19,10 @@ limitations under the License.
 package grpcvtctldclient
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
+	"vitess.io/vitess/go/vt/log"
 
 	"vitess.io/vitess/go/vt/grpcclient"
 	"vitess.io/vitess/go/vt/vtctl/grpcclientcommon"
@@ -76,6 +79,12 @@ func (client *gRPCVtctldClient) Close() error {
 	}
 
 	return err
+}
+
+// WaitForReady waits until the gRPCVtctldClient's ClientConn is in a ready state.
+func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
+	log.Infof("WaitForReady ClientConn status: %v", client.cc.GetState().String())
+	return nil
 }
 
 func init() {

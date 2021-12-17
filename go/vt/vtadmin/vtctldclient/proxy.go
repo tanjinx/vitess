@@ -26,6 +26,7 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtadmin/debug"
 	"vitess.io/vitess/go/vt/vtadmin/vtadminproto"
@@ -92,7 +93,11 @@ func New(cfg *Config) *ClientProxy {
 	}
 }
 
-// Dial is part of the Proxy interface.
+// Dial is part of the Proxy interface.	Dial opens a gRPC connection to a vtctld
+// in the cluster. If the Proxy already has a valid connection, then Dial will
+// verify that the gRPC connection is ready for work. If the Proxy's existing connection
+// is closed or otherwise unready, then the connection will the closed and a new
+// vtctld will be discovered.
 func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	span, ctx := trace.NewSpan(ctx, "VtctldClientProxy.Dial")
 	defer span.Finish()
@@ -102,16 +107,27 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.m.Lock()
 	defer vtctld.m.Unlock()
 
+	// We have an existing connection, although it may have been closed or
+	// become otherwise stale since it was last dialed. Hence, we test that
+	// the connection is actually to ready receive work.
 	if vtctld.VtctldClient != nil {
 		if !vtctld.closed {
-			span.Annotate("is_noop", true)
-			span.Annotate("vtctld_host", vtctld.host)
+			// Wait for the connection to be ready.
+			err := vtctld.VtctldClient.WaitForReady(ctx)
+			if err == nil {
+				span.Annotate("is_noop", true)
+				span.Annotate("vtctld_host", vtctld.host)
 
-			vtctld.lastPing = time.Now()
+				vtctld.lastPing = time.Now()
 
-			return nil
+				// The existing connection is still usable, so we're good to go.
+				return nil
+			}
+
+			// TODO handle error from WaitForReady
 		}
 
+		log.Infof("Closing stale connection to %s", vtctld.host)
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
@@ -120,10 +136,14 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		}
 	}
 
+	log.Infof("Discovering vtctld to dial...")
+
 	addr, err := vtctld.discovery.DiscoverVtctldAddr(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error discovering vtctld to dial: %w", err)
 	}
+
+	log.Infof("Discovered vtctld %s\n; dialing...", addr)
 
 	span.Annotate("vtctld_host", addr)
 	span.Annotate("is_using_credentials", vtctld.creds != nil)
@@ -148,6 +168,8 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.host = addr
 	vtctld.VtctldClient = client
 	vtctld.closed = false
+
+	log.Infof("Established connection to vtctld %s\n", addr)
 
 	return nil
 }
