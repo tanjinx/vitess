@@ -84,7 +84,38 @@ func (client *gRPCVtctldClient) Close() error {
 // WaitForReady waits until the gRPCVtctldClient's ClientConn is in a ready state.
 func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
 	log.Infof("WaitForReady ClientConn status: %v", client.cc.GetState().String())
+
+	// for {
+	// 	select {
+	// 	case <-ctx.Done():
+	// 		return fmt.Errorf("connWaitTimeoutExceeded")
+
+	// 	// wait and check
+	// 	default:
+	// 		// See https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md
+	// 		state := client.cc.GetState()
+	// 		log.Infof("gRPCVtctldClient state: %s\n", state)
+	// 		switch state {
+	// 		case connectivity.Idle, connectivity.Ready:
+	// 			return nil
+	// 		default:
+	// 			// TODO make a flag for second parameter called connWaitTimeout
+	// 			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	// 			defer cancel()
+
+	// 			// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
+	// 			if !client.cc.WaitForStateChange(ctx, state) {
+	// 				// failed to transition, close, and get a new connection
+	// 				return fmt.Errorf("failed to transition")
+	// 			}
+	// 			// Check again that it is Idle/Ready and then return
+	// 		}
+
+	// 	}
+	// }
+
 	return nil
+
 }
 
 func init() {
