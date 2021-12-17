@@ -67,3 +67,60 @@ func TestDial(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, listener.Addr().String(), proxy.host)
 }
+
+func TestConnectivity(t *testing.T) {
+	listener1, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	defer listener1.Close()
+	vtctld1 := &fakeVtctld{}
+	server1 := grpc.NewServer()
+	vtctlservicepb.RegisterVtctlServer(server1, vtctld1)
+
+	listener2, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	defer listener2.Close()
+	vtctld2 := &fakeVtctld{}
+	server2 := grpc.NewServer()
+	vtctlservicepb.RegisterVtctlServer(server2, vtctld2)
+
+	disco := fakediscovery.New()
+	disco.AddTaggedVtctlds(nil, &vtadminpb.Vtctld{
+		Hostname: listener1.Addr().String(),
+	}, &vtadminpb.Vtctld{
+		Hostname: listener2.Addr().String(),
+	})
+
+	proxy := New(&Config{
+		Cluster: &vtadminpb.Cluster{
+			Id:   "test",
+			Name: "testcluster",
+		},
+		Discovery: disco,
+	})
+
+	// We don't have a vtctld host until we call Dial
+	require.Empty(t, proxy.host)
+
+	err = proxy.Dial(context.Background())
+	assert.NoError(t, err)
+
+	// vtadmin's fakediscovery package discovers vtctlds in random order. Rather
+	// than force some cumbersome sequential logic, we can just do a switcheroo
+	// here in the test.
+	var nextAddr string
+
+	switch proxy.host {
+	case listener1.Addr().String():
+		server1.Stop()
+		nextAddr = listener2.Addr().String()
+
+	case listener2.Addr().String():
+		server2.Stop()
+		nextAddr = listener1.Addr().String()
+	}
+
+	err = proxy.Dial(context.Background())
+	assert.NoError(t, err)
+
+	assert.Equal(t, nextAddr, proxy.host)
+}
