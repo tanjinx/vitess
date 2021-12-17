@@ -93,7 +93,8 @@ func New(cfg *Config) *ClientProxy {
 	}
 }
 
-// Dial is part of the Proxy interface.	Dial opens a gRPC connection to a vtctld
+// Dial is part of the Proxy interface.	Callers should call Dial before issuing
+// any gRPC requests against the vtctld. Dial opens a gRPC connection to a vtctld
 // in the cluster. If the Proxy already has a valid connection, then Dial will
 // verify that the gRPC connection is ready for work. If the Proxy's existing connection
 // is closed or otherwise unready, then the connection will the closed and a new
