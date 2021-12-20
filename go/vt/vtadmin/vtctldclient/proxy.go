@@ -108,23 +108,25 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.m.Lock()
 	defer vtctld.m.Unlock()
 
+	waitContext, waitCancel := context.WithTimeout(ctx, 2*time.Second)
+	defer waitCancel()
+
 	// If a cached connection to a vtctld exists, verify that it is still
 	// open and ready for work.
 	if vtctld.VtctldClient != nil {
 		if !vtctld.closed {
 			// Wait for the connection to be ready for work.
-			err := vtctld.VtctldClient.WaitForReady(ctx)
-			if err != nil {
-				return fmt.Errorf("error waiting for connection to vtctld %s to be ready: %w", vtctld.host, err)
+			if err := vtctld.VtctldClient.WaitForReady(waitContext); err == nil {
+				// The existing connection is still usable, so we're good to go.
+				span.Annotate("is_noop", true)
+				span.Annotate("vtctld_host", vtctld.host)
+
+				vtctld.lastPing = time.Now()
+
+				return nil
 			}
-
-			// The existing connection is still usable, so we're good to go.
-			span.Annotate("is_noop", true)
-			span.Annotate("vtctld_host", vtctld.host)
-
-			vtctld.lastPing = time.Now()
-
-			return nil
+			// If WaitForReady does return an error, then fall through to close
+			// the cached connection + establish a new one.
 		}
 
 		log.Infof("Closing stale connection to %s", vtctld.host)
@@ -162,6 +164,13 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	client, err := vtctld.DialFunc(addr, grpcclient.FailFast(false), opts...)
 	if err != nil {
 		return err
+	}
+
+	// TODO waitforready and then just fail the request if it can't.
+	// Here, if we can't transition a READY connection to our newly establishled
+	// connection, then fail. An enhancement could be to keep redialing if this happens.
+	if err := client.WaitForReady(waitContext); err != nil {
+		return fmt.Errorf("Could not transition to READY connection for %s", addr)
 	}
 
 	vtctld.dialedAt = time.Now()

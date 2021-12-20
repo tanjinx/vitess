@@ -21,7 +21,6 @@ package grpcvtctldclient
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -89,76 +88,63 @@ func (client *gRPCVtctldClient) Close() error {
 // an error if the client is not able to transition to the connectivity.Ready
 // state within the given context timeout.
 func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
-	state := client.cc.GetState()
-	log.Infof("gRPCVtctldClient ClientConn status: %v", state.String())
+	// Wait and check the gRPC connection to the vtctld until one of the following happens:
+	//
+	//		- The connection enters (or is already in) a READY state, in which case
+	//		  the caller can use the existing connection.
+	//
+	//		- The connection enters a SHUTDOWN state. The caller should close the
+	// 		  connection and establish a new one, as connections never transition
+	//		  out of the SHUTDOWN state.
+	//
+	//		- The connection fails to enter a READY state within the context timeout.
+	//		  The caller can assume the connection is unusable and is advised to
+	// 		  close the connection.
+	for {
+		select {
+		// A READY connection could not be established within the context timeout.
+		// The caller should close their existing connection and establish a new one.
+		case <-ctx.Done():
+			return fmt.Errorf("Connection wait time exceeded in gRPCVtctldClient WaitForReady")
 
-	switch state {
-	case connectivity.Ready:
-		return nil
+		// Wait and check
+		default:
+			state := client.cc.GetState()
+			log.Infof("gRPCVtctldClient ClientConn status: %v", state.String())
 
-	// Per https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md,
-	// any clients in the SHUTDOWN state never leave this state, and all new RPCs should
-	// fail immediately. So, we don't need to waste time by continuing to poll and can
-	// return an error immediately.
-	case connectivity.Shutdown:
-		return fmt.Errorf("gRPCVtctldClient in SHUTDOWN state")
+			switch state {
+			// The connection is ready to be used.
+			case connectivity.Ready:
+				return nil
 
-	// If the connection is IDLE, CONNECTING, or in a TRANSIENT_FAILURE mode,
-	// then we wait to see if it will transition to a ready state.
-	default:
-		// TODO make a flag for second parameter called connWaitTimeout
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-		defer cancel()
+			// Per https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md,
+			// any clients in the SHUTDOWN state never leave this state, and all new RPCs should
+			// fail immediately. So, we don't need to waste time by continuing to poll and can
+			// return an error immediately.
+			case connectivity.Shutdown:
+				return fmt.Errorf("gRPCVtctldClient in SHUTDOWN state")
 
-		// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
-		if !client.cc.WaitForStateChange(ctx, state) {
-			// failed to transition, close, and get a new connection
-			return fmt.Errorf("failed to transition")
+			// If the connection is IDLE, CONNECTING, or in a TRANSIENT_FAILURE mode,
+			// then we wait to see if it will transition to a ready state.
+			default:
+				// WaitForStateChange waits until the connectivity.State of ClientConn
+				// changes from sourceState or ctx expires. A true value is returned in former case and false in latter.
+				// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
+				// TODO add a note to explain why we reuse the context.
+				if !client.cc.WaitForStateChange(ctx, state) {
+					// If the client has failed to transition, fail so that the caller can close the conneciton.
+					return fmt.Errorf("failed to transition")
+				}
+
+				log.Infof("Waited for state change, new state: %s", client.cc.GetState().String())
+				// Continue looping. It's possible we have transitioned to a READY state,
+				// in which case the next loop iteration will return. Same for transitioning
+				// to a SHUTDOWN state. Otherwise, we have transitioned into one of CONNECTING, IDLE, or TRANSIENT_FAILURE,
+				// all of which can potentially transition into a READY state.
+				// See https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md
+			}
 		}
 	}
-
-	// for {
-	// 	select {
-	// 	case <-ctx.Done():
-	// 		return fmt.Errorf("connWaitTimeoutExceeded")
-
-	// 	// Wait and check
-	// 	default:
-	// 		return nil
-	// 	}
-	// }
-
-	// for {
-	// 	select {
-	// 	case <-ctx.Done():
-	// 		return fmt.Errorf("connWaitTimeoutExceeded")
-
-	// 	// wait and check
-	// 	default:
-	// 		// See https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md
-	// 		state := client.cc.GetState()
-	// 		log.Infof("gRPCVtctldClient state: %s\n", state)
-	// 		switch state {
-	// 		case connectivity.Idle, connectivity.Ready:
-	// 			return nil
-	// 		default:
-	// 			// TODO make a flag for second parameter called connWaitTimeout
-	// 			ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	// 			defer cancel()
-
-	// 			// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
-	// 			if !client.cc.WaitForStateChange(ctx, state) {
-	// 				// failed to transition, close, and get a new connection
-	// 				return fmt.Errorf("failed to transition")
-	// 			}
-	// 			// Check again that it is Idle/Ready and then return
-	// 		}
-
-	// 	}
-	// }
-
-	return nil
-
 }
 
 func init() {
