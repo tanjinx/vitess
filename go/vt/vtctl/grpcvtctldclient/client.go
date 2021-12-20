@@ -20,8 +20,11 @@ package grpcvtctldclient
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"vitess.io/vitess/go/vt/log"
 
 	"vitess.io/vitess/go/vt/grpcclient"
@@ -81,9 +84,49 @@ func (client *gRPCVtctldClient) Close() error {
 	return err
 }
 
-// WaitForReady waits until the gRPCVtctldClient's ClientConn is in a ready state.
+// WaitForReady waits until the gRPCVtctldClient's ClientConn is in a ready state,
+// to a maximum wait time configurable with the TODO flag. This call will return
+// an error if the client is not able to transition to the connectivity.Ready
+// state within the given context timeout.
 func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
-	log.Infof("WaitForReady ClientConn status: %v", client.cc.GetState().String())
+	state := client.cc.GetState()
+	log.Infof("gRPCVtctldClient ClientConn status: %v", state.String())
+
+	switch state {
+	case connectivity.Ready:
+		return nil
+
+	// Per https://github.com/grpc/grpc/blob/master/doc/connectivity-semantics-and-api.md,
+	// any clients in the SHUTDOWN state never leave this state, and all new RPCs should
+	// fail immediately. So, we don't need to waste time by continuing to poll and can
+	// return an error immediately.
+	case connectivity.Shutdown:
+		return fmt.Errorf("gRPCVtctldClient in SHUTDOWN state")
+
+	// If the connection is IDLE, CONNECTING, or in a TRANSIENT_FAILURE mode,
+	// then we wait to see if it will transition to a ready state.
+	default:
+		// TODO make a flag for second parameter called connWaitTimeout
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		// https://pkg.go.dev/google.golang.org/grpc#ClientConn.WaitForStateChange
+		if !client.cc.WaitForStateChange(ctx, state) {
+			// failed to transition, close, and get a new connection
+			return fmt.Errorf("failed to transition")
+		}
+	}
+
+	// for {
+	// 	select {
+	// 	case <-ctx.Done():
+	// 		return fmt.Errorf("connWaitTimeoutExceeded")
+
+	// 	// Wait and check
+	// 	default:
+	// 		return nil
+	// 	}
+	// }
 
 	// for {
 	// 	select {
