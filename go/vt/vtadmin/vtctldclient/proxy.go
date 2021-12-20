@@ -133,7 +133,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
-		// FIXME fix this error
+		// FIXME why isn't this closing argh
 		if err := vtctld.Close(); err != nil {
 			return fmt.Errorf("error closing possibly-stale connection before re-dialing: %w", err)
 		}
