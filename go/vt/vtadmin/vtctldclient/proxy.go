@@ -108,24 +108,23 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.m.Lock()
 	defer vtctld.m.Unlock()
 
-	// We have an existing connection, although it may have been closed or
-	// become otherwise stale since it was last dialed. Hence, we test that
-	// the connection is actually to ready receive work.
+	// If a cached connection to a vtctld exists, verify that it is still
+	// open and ready for work.
 	if vtctld.VtctldClient != nil {
 		if !vtctld.closed {
-			// Wait for the connection to be ready.
+			// Wait for the connection to be ready for work.
 			err := vtctld.VtctldClient.WaitForReady(ctx)
-			if err == nil {
-				span.Annotate("is_noop", true)
-				span.Annotate("vtctld_host", vtctld.host)
-
-				vtctld.lastPing = time.Now()
-
-				// The existing connection is still usable, so we're good to go.
-				return nil
+			if err != nil {
+				return fmt.Errorf("error waiting for connection to vtctld %s to be ready: %w", vtctld.host, err)
 			}
 
-			// TODO handle error from WaitForReady
+			// The existing connection is still usable, so we're good to go.
+			span.Annotate("is_noop", true)
+			span.Annotate("vtctld_host", vtctld.host)
+
+			vtctld.lastPing = time.Now()
+
+			return nil
 		}
 
 		log.Infof("Closing stale connection to %s", vtctld.host)
