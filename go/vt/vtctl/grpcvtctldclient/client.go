@@ -74,10 +74,12 @@ func NewWithDialOpts(addr string, failFast grpcclient.FailFast, opts ...grpc.Dia
 	}, nil
 }
 
+// Close tears down the vtctld ClientConn and all underlying connections.
 func (client *gRPCVtctldClient) Close() error {
 	err := client.cc.Close()
 	if err == nil {
 		client.c = nil
+		return nil
 	}
 
 	return err
@@ -133,7 +135,7 @@ func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
 				// TODO add a note to explain why we reuse the context.
 				if !client.cc.WaitForStateChange(ctx, state) {
 					// If the client has failed to transition, fail so that the caller can close the conneciton.
-					return fmt.Errorf("failed to transition")
+					return fmt.Errorf("failed to transition from state %s", state)
 				}
 
 				log.Infof("Waited for state change, new state: %s", client.cc.GetState().String())

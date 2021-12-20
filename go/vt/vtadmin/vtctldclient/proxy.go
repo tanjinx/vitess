@@ -133,6 +133,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
+		// FIXME fix this error
 		if err := vtctld.Close(); err != nil {
 			return fmt.Errorf("error closing possibly-stale connection before re-dialing: %w", err)
 		}
@@ -166,10 +167,13 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		return err
 	}
 
+	log.Infof("Established a gRPC connection to %s; waiting to transition to READY...", addr)
+
 	// TODO waitforready and then just fail the request if it can't.
 	// Here, if we can't transition a READY connection to our newly establishled
 	// connection, then fail. An enhancement could be to keep redialing if this happens.
 	if err := client.WaitForReady(waitContext); err != nil {
+		log.Infof("Could not transition to READY connection for %s", addr)
 		return fmt.Errorf("Could not transition to READY connection for %s", addr)
 	}
 
@@ -178,16 +182,17 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.VtctldClient = client
 	vtctld.closed = false
 
-	log.Infof("Established connection to vtctld %s\n", addr)
+	log.Infof("Established READY connection to vtctld %s\n", addr)
 
 	return nil
 }
 
 // Close is part of the Proxy interface.
 func (vtctld *ClientProxy) Close() error {
-	if vtctld.VtctldClient == nil {
-		vtctld.closed = true
+	// Mark the connection as closed even if an error in VtctldClient.Close occurs.
+	vtctld.closed = true
 
+	if vtctld.VtctldClient == nil {
 		return nil
 	}
 
@@ -195,8 +200,6 @@ func (vtctld *ClientProxy) Close() error {
 	if err != nil {
 		return err
 	}
-
-	vtctld.closed = true
 
 	return nil
 }
