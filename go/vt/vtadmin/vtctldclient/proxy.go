@@ -26,6 +26,7 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtadmin/debug"
 	"vitess.io/vitess/go/vt/vtadmin/vtadminproto"
@@ -104,6 +105,8 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 
 	if vtctld.VtctldClient != nil {
 		if !vtctld.closed {
+			log.Infof("Using cached connection to vtctld %s", vtctld.host)
+
 			span.Annotate("is_noop", true)
 			span.Annotate("vtctld_host", vtctld.host)
 
@@ -113,6 +116,8 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		}
 
 		span.Annotate("is_stale", true)
+
+		log.Infof("Closing stale connection to vtctld %s", vtctld.host)
 
 		// close before reopen. this is safe to call on an already-closed client.
 		if err := vtctld.Close(); err != nil {
@@ -125,6 +130,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		return fmt.Errorf("error discovering vtctld to dial: %w", err)
 	}
 
+	log.Infof("Discovered vtctld %s; dialing...\n", addr)
 	span.Annotate("vtctld_host", addr)
 	span.Annotate("is_using_credentials", vtctld.creds != nil)
 
@@ -148,6 +154,8 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.host = addr
 	vtctld.VtctldClient = client
 	vtctld.closed = false
+
+	log.Infof("Established connection to vtctld %s\n", addr)
 
 	return nil
 }
