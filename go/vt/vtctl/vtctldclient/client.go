@@ -3,16 +3,22 @@
 package vtctldclient
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	vtctlservicepb "vitess.io/vitess/go/vt/proto/vtctlservice"
 )
 
-// VtctldClient augments the vtctlservicepb.VtctlClient interface with io.Closer.
+// VtctldClient augments the vtctlservicepb.VtctlClient interface
 type VtctldClient interface {
 	vtctlservicepb.VtctldClient
 	Close() error
+
+	// WaitForReady waits until the connection is in a ready state or until
+	// the context times out. This is used by the dialer to check that
+	//  an established connection is ready for work.
+	WaitForReady(ctx context.Context) error
 }
 
 // Factory is a function that creates new VtctldClients.
