@@ -26,6 +26,7 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtadmin/debug"
 	"vitess.io/vitess/go/vt/vtadmin/vtadminproto"
@@ -92,7 +93,12 @@ func New(cfg *Config) *ClientProxy {
 	}
 }
 
-// Dial is part of the Proxy interface.
+// Dial is part of the Proxy interface.	Callers should call Dial before issuing
+// any gRPC requests against the vtctld. Dial opens a gRPC connection to a vtctld
+// in the cluster. If the Proxy already has a valid connection, then Dial will
+// verify that the gRPC connection is ready for work. If the Proxy's existing connection
+// is closed or otherwise unready, then the connection will the closed and a new
+// vtctld will be discovered.
 func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	span, ctx := trace.NewSpan(ctx, "VtctldClientProxy.Dial")
 	defer span.Finish()
@@ -102,28 +108,47 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.m.Lock()
 	defer vtctld.m.Unlock()
 
+	// FIXME add a flag for this
+	waitContext, waitCancel := context.WithTimeout(ctx, 2*time.Second)
+	defer waitCancel()
+
+	// If a cached connection to a vtctld exists, verify that it is still
+	// open and ready for work.
 	if vtctld.VtctldClient != nil {
 		if !vtctld.closed {
-			span.Annotate("is_noop", true)
-			span.Annotate("vtctld_host", vtctld.host)
+			// Wait for the connection to be ready for work.
+			if err := vtctld.VtctldClient.WaitForReady(waitContext); err == nil {
+				// The existing connection is still usable, so we're good to go.
+				span.Annotate("is_noop", true)
+				span.Annotate("vtctld_host", vtctld.host)
 
-			vtctld.lastPing = time.Now()
+				vtctld.lastPing = time.Now()
 
-			return nil
+				return nil
+			}
+			// If WaitForReady does return an error, then fall through to close
+			// the cached connection + establish a new one.
 		}
 
+		log.Infof("Closing stale connection to %s", vtctld.host)
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
 		if err := vtctld.Close(); err != nil {
-			return fmt.Errorf("error closing possibly-stale connection before re-dialing: %w", err)
+			// FIXME why isn't this closing argh. This should return the error, not
+			// just log it; I think we are leaking connections hhmhm
+			log.Errorf("error closing possibly-stale connection before re-dialing: %w", err)
 		}
 	}
+
+	log.Infof("Discovering vtctld to dial...")
 
 	addr, err := vtctld.discovery.DiscoverVtctldAddr(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error discovering vtctld to dial: %w", err)
 	}
+
+	log.Infof("Discovered vtctld %s\n; dialing...", addr)
 
 	span.Annotate("vtctld_host", addr)
 	span.Annotate("is_using_credentials", vtctld.creds != nil)
@@ -144,19 +169,31 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		return err
 	}
 
+	log.Infof("Established a gRPC connection to %s; waiting to transition to READY...", addr)
+
+	// Here, if we can't transition a READY connection to our newly establishled
+	// connection, then fail. An enhancement could be to keep redialing if this happens.
+	if err := client.WaitForReady(waitContext); err != nil {
+		log.Infof("Could not transition to READY connection for %s", addr)
+		return fmt.Errorf("Could not transition to READY connection for %s", addr)
+	}
+
 	vtctld.dialedAt = time.Now()
 	vtctld.host = addr
 	vtctld.VtctldClient = client
 	vtctld.closed = false
+
+	log.Infof("Established READY connection to vtctld %s\n", addr)
 
 	return nil
 }
 
 // Close is part of the Proxy interface.
 func (vtctld *ClientProxy) Close() error {
-	if vtctld.VtctldClient == nil {
-		vtctld.closed = true
+	// Mark the connection as closed even if an error in VtctldClient.Close occurs.
+	vtctld.closed = true
 
+	if vtctld.VtctldClient == nil {
 		return nil
 	}
 
@@ -164,8 +201,6 @@ func (vtctld *ClientProxy) Close() error {
 	if err != nil {
 		return err
 	}
-
-	vtctld.closed = true
 
 	return nil
 }
