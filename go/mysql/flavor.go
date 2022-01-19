@@ -17,12 +17,11 @@ limitations under the License.
 package mysql
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-
-	"context"
 
 	"vitess.io/vitess/go/sqltypes"
 	"vitess.io/vitess/go/vt/proto/vtrpc"
@@ -306,7 +305,10 @@ func parseReplicationStatus(fields map[string]string) ReplicationStatus {
 	status := ReplicationStatus{
 		MasterHost: fields["Master_Host"],
 		// These fields are returned from the underlying DB and cannot be renamed
-		IOThreadRunning:  fields["Slave_IO_Running"] == "Yes" || fields["Slave_IO_Running"] == "Connecting",
+		// Removing an OR for `Slave_IO_Running=Connecting` since a replica can be stuck in this state
+		// for many days, up to `MASTER_RETRY_COUNT*MASTER_CONNECT_RETRY`, with Seconds_Behind_Master=0
+		// thus making a replica serve stale data to consumers ...
+		IOThreadRunning:  fields["Slave_IO_Running"] == "Yes",
 		SQLThreadRunning: fields["Slave_SQL_Running"] == "Yes",
 	}
 	parseInt, _ := strconv.ParseInt(fields["Master_Port"], 10, 0)

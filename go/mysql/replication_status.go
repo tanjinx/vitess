@@ -19,6 +19,7 @@ package mysql
 import (
 	"fmt"
 
+	"vitess.io/vitess/go/vt/log"
 	replicationdatapb "vitess.io/vitess/go/vt/proto/replicationdata"
 	"vitess.io/vitess/go/vt/vterrors"
 )
@@ -46,6 +47,7 @@ type ReplicationStatus struct {
 // ReplicationRunning returns true iff both the IO and SQL threads are
 // running.
 func (s *ReplicationStatus) ReplicationRunning() bool {
+	log.V(1).Infof("debug: ReplicationStatus=%+v",s)
 	return s.IOThreadRunning && s.SQLThreadRunning
 }
 

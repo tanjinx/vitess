@@ -17,12 +17,12 @@ limitations under the License.
 package mysql
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"time"
 
-	"context"
-
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/proto/vtrpc"
 	"vitess.io/vitess/go/vt/vterrors"
 )
@@ -135,6 +135,7 @@ func (mysqlFlavor) status(c *Conn) (ReplicationStatus, error) {
 		return ReplicationStatus{}, err
 	}
 
+	log.V(1).Infof("debug: SHOW SLAVE STATUS=%+v",resultMap)
 	return parseMysqlReplicationStatus(resultMap)
 }
 
