@@ -135,7 +135,11 @@ func (mysqlFlavor) status(c *Conn) (ReplicationStatus, error) {
 		return ReplicationStatus{}, err
 	}
 
-	log.V(1).Infof("debug: SHOW SLAVE STATUS=%+v",resultMap)
+	if log.V(1) {
+		for k, v := range resultMap {
+			log.Infof("debug: SHOW SLAVE STATUS resultMap.%s: %s", k, v)
+		}
+	}
 	return parseMysqlReplicationStatus(resultMap)
 }
 
