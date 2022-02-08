@@ -56,13 +56,14 @@ Dependencies can be one of:
 
 For both direct dependencies and nth-order dependencies, the _exact_ versions we are using are "pinned" in the [package-lock.json](./package-lock.json) file.
 
+In most cases, we only need to update direct dependencies. Security vulnerabilties, however, may require updating nth-order dependencies directly. Both scenarios are described below. 
 
-## Step 0: Prerequisites
+### Step 0: Prerequisites for updating
 
 1. Check that you have the correct versions of node/npm as described in [Prerequisites](#prerequisites].
 2. Ensure that you have a clean install: `rm -rf node_modules && npm install`
 
-### Step 1: identify the package in the dependency tree. 
+### Step 1: Identify the package in the dependency tree. 
 
 When updating a package, first check if it is a direct dependency or an nth-order dependency with [npm list](https://docs.npmjs.com/cli/v7/commands/npm-ls). 
 
