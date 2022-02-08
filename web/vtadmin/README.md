@@ -1,5 +1,13 @@
 # VTAdmin
 
+VTAdmin is a browser interface and HTTP API for administering Vitess deployments. This codebase contains the code for the browser interface, vtadmin-web; the code for the HTTP API, vtadmin-api, is found at [`go/vt/vtadmin/`](../../go/vt/vtadmin/).
+
+## Security
+
+To report a security vulnerability, please email [vitess-maintainers](mailto:cncf-vitess-maintainers@lists.cncf.io).
+
+See [Security](SECURITY.md) for a full outline of the security process.
+
 ## Prerequisites
 
 - [node](https://nodejs.org) >= 16.13.0 LTS
