@@ -8,10 +8,15 @@ To report a security vulnerability, please email [vitess-maintainers](mailto:cnc
 
 See [Security](SECURITY.md) for a full outline of the security process.
 
+For instructions on updating dependencies in this codebase, see [Updating Dependencies](#updating-dependencies). 
+
 ## Prerequisites
+
+In order to run and/or build vtadmin-web, you will need the following:
 
 - [node](https://nodejs.org) >= 16.13.0 LTS
 - npm >= 8.1.0 (comes with node)
+
 
 ## Available scripts
 
@@ -40,6 +45,125 @@ Scripts for common and not-so-common tasks. These are always run from the `vites
 Under the hood, we use create-react-app's environment variable set-up which is very well documented: https://create-react-app.dev/docs/adding-custom-environment-variables. 
 
 All of our environment variables are enumerated and commented in [react-app-env.d.ts](./src/react-app-env.d.ts). This also gives us type hinting on `process.env`, for editors that support it. 
+
+## Updating Dependencies
+
+We aim to keep our dependencies up to date, and to fix vulnerabilities quickly. Updating dependencies ins't always straightforward, so this section offers some guidance. 
+
+Dependencies can be one of:
+- Direct dependencies, which are the packages listed in the [package.json](./package.json) file, along with a semver.
+- nth-order dependencies, which are nested packages included by direct dependencies. 
+
+For both direct dependencies and nth-order dependencies, the _exact_ versions we are using are "pinned" in the [package-lock.json](./package-lock.json) file.
+
+
+## Step 0: Prerequisites
+
+1. Check that you have the correct versions of node/npm as described in [Prerequisites](#prerequisites].
+2. Ensure that you have a clean install: `rm -rf node_modules && npm install`
+
+### Step 1: identify the package in the dependency tree. 
+
+When updating a package, first check if it is a direct dependency or an nth-order dependency with [npm list](https://docs.npmjs.com/cli/v7/commands/npm-ls). 
+
+```bash
+# The "dayjs" package is a direct dependency
+
+$ npm list dayjs
+vtadmin@0.1.0 /Users/sara/workspace/vitess/web/vtadmin
+└── dayjs@1.10.7
+
+# "nanoid" is a second-order dependency; we don't include it directly,
+# but it is used by the "postcss" package (which is a direct dependency). 
+
+$ npm list nanoid
+vtadmin@0.1.0 /Users/sara/workspace/vitess/web/vtadmin
+└─┬ postcss@8.4.6
+  └── nanoid@3.2.0
+
+# "react" is both a direct dependency, and a peer dependency
+# of several other packages.
+$ npm list react
+vtadmin@0.1.0 /Users/sara/workspace/vitess/web/vtadmin
+├─┬ @headlessui/react@1.4.2
+│ └── react@17.0.1 deduped
+├─┬ @testing-library/react-hooks@5.1.3
+│ ├─┬ react-error-boundary@3.1.4
+│ │ └── react@17.0.1 deduped
+│ └── react@17.0.1 deduped
+├─┬ @testing-library/react@11.2.7
+│ └── react@17.0.1 deduped
+├─┬ downshift@6.1.7
+│ └── react@17.0.1 deduped
+├─┬ highcharts-react-official@3.1.0
+│ └── react@17.0.1 deduped
+├─┬ react-dom@17.0.1
+│ └── react@17.0.1 deduped
+├─┬ react-query@3.5.9
+│ └── react@17.0.1 deduped
+├─┬ react-router-dom@5.3.0
+│ ├─┬ react-router@5.2.1
+│ │ ├─┬ mini-create-react-context@0.4.1
+│ │ │ └── react@17.0.1 deduped
+│ │ └── react@17.0.1 deduped
+│ └── react@17.0.1 deduped
+├─┬ react-scripts@5.0.0
+│ └── react@17.0.1 deduped
+├─┬ react-tiny-popover@6.0.10
+│ └── react@17.0.1 deduped
+├─┬ react-toastify@8.1.0
+│ └── react@17.0.1 deduped
+└── react@17.0.1
+```
+
+⚠️ If `npm list` is giving you empty output, ensure you have the correct version of node and npm as described in [Prerequisites](#prerequisites), and that you have run `npm install`. `npm list` lists works from the _installed_ packages in your `node_modules/` folder.
+
+### Step 2: Identify the target version
+
+[`npm outdated`](https://docs.npmjs.com/cli/v7/commands/npm-outdated) checks the npm registry to see if any (or, specific) installed packages are currently outdated. In some cases, as with security vulnerabilities, you may already have a target version in mind.
+
+For the sake of example, let's update the `react` package:
+
+```bash
+🍕~/workspace/vitess/web/vtadmin $ npm outdated react
+Package  Current  Wanted  Latest  Location            Depended by
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-error-boundary
+react     17.0.1  17.0.1  17.0.2  node_modules/react  react-dom
+react     17.0.1  17.0.2  17.0.2  node_modules/react  highcharts-react-official
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-query
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-router
+react     17.0.1  17.0.2  17.0.2  node_modules/react  @testing-library/react-hooks
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-scripts
+react     17.0.1  17.0.2  17.0.2  node_modules/react  vtadmin
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-tiny-popover
+react     17.0.1  17.0.2  17.0.2  node_modules/react  downshift
+react     17.0.1  17.0.2  17.0.2  node_modules/react  @headlessui/react
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-toastify
+react     17.0.1  17.0.2  17.0.2  node_modules/react  @testing-library/react
+react     17.0.1  17.0.2  17.0.2  node_modules/react  react-router-dom
+react     17.0.1  17.0.2  17.0.2  node_modules/react  mini-create-react-context
+```
+
+Note that the react package is shown both as a direct dependency ("Depended by: vtadmin") and an nth-order dependency for several other packages. Also note that the "Wanted" versions can vary.
+
+(TODO: add a note about "Wanted" vs. "Latest".) 
+
+In our case, our target version is `react@17.0.2`. 
+
+### Step 3: View the package's changelog
+
+It is _always_ a good idea to check a package's changelog for breaking or otherwise relevant changes. Even for minor releases, even for nth-order dependencies. 
+
+Searching for a package on https://www.npmjs.com/ will lead you to the package's GitHub repo, where you should be able to find a CHANGELOG.md file. [Here is react's, for example](https://github.com/facebook/react/blob/main/CHANGELOG.md). 
+
+
+### Step 4: Update the package
+
+The mechanism for updating a package depends on whether it is a direct dependency or an nth-order dependency.
+
+**For direct dependencies,**
+
+
 
 ## Linters and Formatters
 
