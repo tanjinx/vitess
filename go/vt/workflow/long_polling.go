@@ -175,7 +175,7 @@ var whiteListedHTTPHeaders = map[string]interface{}{
 	"X-Real-Ip":                 nil,
 }
 
-// sanitizeRequestHeader - makes a copy of r and returns a copy with sanitized headers unless debugOn=true
+// sanitizeRequestHeader - (unless debugOn=true) makes a copy of r and returns it with sanitized headers
 func sanitizeRequestHeader(r *http.Request, debugOn bool) *http.Request {
 	if debugOn {
 		return r
