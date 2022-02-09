@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/golang/glog"
+
 	"vitess.io/vitess/go/acl"
 	"vitess.io/vitess/go/timer"
 	"vitess.io/vitess/go/vt/log"
@@ -159,7 +160,7 @@ func getID(url, base string) (int, error) {
 
 const (
 	LogLevelDumpAllHTTPHeaders glog.Level = 50
-	HTTPHeaderRedactedMessage             = "*** redacted by sanitizeRequestHeader() ***"
+	HTTPHeaderRedactedMessage  string     = "*** redacted by sanitizeRequestHeader() ***"
 )
 
 var whiteListedHTTPHeaders = map[string]interface{}{
