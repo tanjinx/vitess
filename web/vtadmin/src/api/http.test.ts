@@ -97,7 +97,7 @@ describe('api/http', () => {
             mockServerJson(endpoint, response);
 
             const result = await api.vtfetch(endpoint);
-            expect(result).toEqual(response);
+            expect(result).toEqual('nope');
         });
 
         it('throws an error if response.ok is false', async () => {
