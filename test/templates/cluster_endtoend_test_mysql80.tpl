@@ -1,5 +1,12 @@
 name: {{.Name}}
-on: [push, pull_request]
+on: 
+  push:
+    paths-ignore:
+      - 'web/vtadmin/**'
+  pull_request:
+    paths-ignore:
+      - 'web/vtadmin/**'
+
 concurrency:
   group: format('{0}-{1}', ${{"{{"}} github.ref {{"}}"}}, '{{.Name}}')
   cancel-in-progress: true

@@ -1,5 +1,11 @@
 name: {{.Name}}
-on: [push, pull_request]
+on: 
+  push:
+    paths-ignore:
+      - 'web/vtadmin/**'
+  pull_request:
+    paths-ignore:
+      - 'web/vtadmin/**'
 
 jobs:
   build:

@@ -1,7 +1,14 @@
 # DO NOT MODIFY: THIS FILE IS GENERATED USING "make generate_ci_workflows"
 
 name: Cluster (resharding_bytes)
-on: [push, pull_request]
+on: 
+  push:
+    paths-ignore:
+      - 'web/vtadmin/**'
+  pull_request:
+    paths-ignore:
+      - 'web/vtadmin/**'
+
 concurrency:
   group: format('{0}-{1}', ${{ github.ref }}, 'Cluster (resharding_bytes)')
   cancel-in-progress: true
