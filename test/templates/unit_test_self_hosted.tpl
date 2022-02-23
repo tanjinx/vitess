@@ -9,8 +9,15 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+    - name: Check out code
+      uses: actions/checkout@v2
+      
+    - uses: dorny/paths-filter@v2
+      name: Filter out unrelated paths
+      id: paths-filter
+      with:
+        filters: |
+          markdown: '**/*.!(md)'
 
       - name: Build Docker Image
         run: docker build -f {{.Dockerfile}} -t {{.ImageName}}:$GITHUB_SHA  .

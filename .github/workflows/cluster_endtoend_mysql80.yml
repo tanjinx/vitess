@@ -17,6 +17,16 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - uses: dorny/paths-filter@v2
+      name: Filter out unrelated paths
+      id: paths-filter
+      with:
+        filters: |
+          markdown: '**/*.!(md)'
+
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
@@ -31,9 +41,6 @@ jobs:
         # Increase the asynchronous non-blocking I/O. More information at https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_use_native_aio
         echo "fs.aio-max-nr = 1048576" | sudo tee -a /etc/sysctl.conf
         sudo sysctl -p /etc/sysctl.conf
-
-    - name: Check out code
-      uses: actions/checkout@v2
 
     - name: Get dependencies
       run: |
