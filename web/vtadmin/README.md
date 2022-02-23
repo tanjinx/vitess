@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- [node](https://nodejs.org) >= 16.13.0 LTS
+- [node](https://nodejs.org) 16.13.0 LTS
 - npm >= 8.1.0 (comes with node)
 
 ## Available scripts
