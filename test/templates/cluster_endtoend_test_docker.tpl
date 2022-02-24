@@ -1,5 +1,11 @@
 name: {{.Name}}
-on: [push, pull_request]
+on: 
+    push:
+        paths-ignore:
+            - '**.md'
+    pull_request-ignore:
+        paths:
+            - '**.md'
 
 jobs:
   build:

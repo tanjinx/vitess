@@ -41,6 +41,8 @@ const (
 	dockerFileTemplate            = "templates/dockerfile.tpl"
 	clusterTestSelfHostedTemplate = "templates/cluster_endtoend_test_self_hosted.tpl"
 	clusterTestDockerTemplate     = "templates/cluster_endtoend_test_docker.tpl"
+
+	skippedTestTemplate = "templates/skipped_test.tpl"
 )
 
 var (
@@ -374,5 +376,28 @@ func writeFileFromTemplate(templateFile, path string, test interface{}) error {
 	f.WriteString("# DO NOT MODIFY: THIS FILE IS GENERATED USING \"make generate_ci_workflows\"\n\n")
 	f.WriteString(mergeBlankLines(buf))
 	fmt.Printf("Generated %s\n", path)
+
+	// Write skipped test
+	stpl, err := template.ParseFiles(skippedTestTemplate)
+	if err != nil {
+		return fmt.Errorf("Error: %s\n", err)
+	}
+
+	buf = &bytes.Buffer{}
+	err = stpl.Execute(buf, test)
+	if err != nil {
+		return fmt.Errorf("Error: %s\n", err)
+	}
+
+	spath := strings.Replace(path, ".yml", "__skipped.yml", 1) // TODO regex?
+	f, err = os.Create(spath)
+	if err != nil {
+		return fmt.Errorf("Error creating file: %s\n", err)
+	}
+
+	f.WriteString("# DO NOT MODIFY: THIS FILE IS GENERATED USING \"make generate_ci_workflows\"\n\n")
+	f.WriteString(mergeBlankLines(buf))
+	fmt.Printf("Generated %s\n", spath)
+
 	return nil
 }

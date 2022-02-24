@@ -1,7 +1,15 @@
 # DO NOT MODIFY: THIS FILE IS GENERATED USING "make generate_ci_workflows"
 
 name: Cluster (17)
-on: [push, pull_request]
+
+on: 
+    push:
+        paths-ignore:
+            - '**.md'
+    pull_request-ignore:
+        paths:
+            - '**.md'
+
 concurrency:
   group: format('{0}-{1}', ${{ github.ref }}, 'Cluster (17)')
   cancel-in-progress: true

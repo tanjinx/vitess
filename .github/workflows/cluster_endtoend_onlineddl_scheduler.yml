@@ -1,7 +1,15 @@
 # DO NOT MODIFY: THIS FILE IS GENERATED USING "make generate_ci_workflows"
 
 name: Cluster (onlineddl_scheduler)
-on: [push, pull_request]
+
+on: 
+    push:
+        paths-ignore:
+            - '**.md'
+    pull_request-ignore:
+        paths:
+            - '**.md'
+
 concurrency:
   group: format('{0}-{1}', ${{ github.ref }}, 'Cluster (onlineddl_scheduler)')
   cancel-in-progress: true

@@ -1,0 +1,16 @@
+# DO NOT MODIFY: THIS FILE IS GENERATED USING "make generate_ci_workflows"
+
+name: Cluster (resharding)
+on: 
+    push:
+        paths:
+            - '**.md'
+    pull_request:
+        paths:
+            - '**.md'
+
+jobs:
+  skip:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No test required" '
