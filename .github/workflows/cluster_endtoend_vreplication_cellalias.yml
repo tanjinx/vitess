@@ -1,13 +1,12 @@
 # DO NOT MODIFY: THIS FILE IS GENERATED USING "make generate_ci_workflows"
 
 name: Cluster (vreplication_cellalias)
-
 on: 
     push:
         paths-ignore:
             - '**.md'
-    pull_request-ignore:
-        paths:
+    pull_request:
+        paths-ignore:
             - '**.md'
 
 concurrency:

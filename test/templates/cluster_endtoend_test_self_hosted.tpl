@@ -1,11 +1,10 @@
 name: {{.Name}}
-
 on: 
     push:
         paths-ignore:
             - '**.md'
-    pull_request-ignore:
-        paths:
+    pull_request:
+        paths-ignore:
             - '**.md'
 
 concurrency:
