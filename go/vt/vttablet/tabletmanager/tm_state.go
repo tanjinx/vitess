@@ -28,7 +28,7 @@ import (
 
 	"context"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/key"
@@ -313,6 +313,33 @@ func (ts *tmState) populateLocalMetadataLocked() {
 	}
 }
 
+func (ts *tmState) populateLocalMetadataLocked() {
+	if ts.tm.MetadataManager == nil {
+		return
+	}
+
+	if ts.isOpening && !*initPopulateMetadata {
+		return
+	}
+
+	localMetadata := ts.tm.getLocalMetadataValues(ts.tablet.Type)
+	dbName := topoproto.TabletDbName(ts.tablet)
+
+	if !ts.hasCreatedMetadataTables {
+		if err := ts.tm.MetadataManager.PopulateMetadataTables(ts.tm.MysqlDaemon, localMetadata, dbName); err != nil {
+			log.Errorf("PopulateMetadataTables(%v) failed: %v", localMetadata, err)
+			return
+		}
+
+		ts.hasCreatedMetadataTables = true
+		return
+	}
+
+	if err := ts.tm.MetadataManager.UpsertLocalMetadata(ts.tm.MysqlDaemon, localMetadata, dbName); err != nil {
+		log.Errorf("UpsertMetadataTables(%v) failed: %v", localMetadata, err)
+	}
+}
+
 func (ts *tmState) canServe(tabletType topodatapb.TabletType) string {
 	if !topo.IsRunningQueryService(tabletType) {
 		return fmt.Sprintf("not a serving tablet type(%v)", tabletType)
@@ -368,7 +395,8 @@ func (ts *tmState) publishStateLocked(ctx context.Context) {
 			log.Error(err)
 			return topo.NewError(topo.NoUpdateNeeded, "")
 		}
-		*tablet = *proto.Clone(ts.tablet).(*topodatapb.Tablet)
+		proto.Reset(tablet)
+		proto.Merge(tablet, ts.tablet)
 		return nil
 	})
 	if err != nil {
@@ -399,7 +427,8 @@ func (ts *tmState) retryPublish() {
 				log.Error(err)
 				return topo.NewError(topo.NoUpdateNeeded, "")
 			}
-			*tablet = *proto.Clone(ts.tablet).(*topodatapb.Tablet)
+			proto.Reset(tablet)
+			proto.Merge(tablet, ts.tablet)
 			return nil
 		})
 		cancel()
