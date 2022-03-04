@@ -26,6 +26,7 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
+	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtadmin/debug"
 	"vitess.io/vitess/go/vt/vtadmin/vtadminproto"
@@ -102,16 +103,31 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.m.Lock()
 	defer vtctld.m.Unlock()
 
+	// Check if we have a cached connection to the vtctld.
 	if vtctld.VtctldClient != nil {
+		// Check if the cached connection is open.
 		if !vtctld.closed {
-			span.Annotate("is_noop", true)
-			span.Annotate("vtctld_host", vtctld.host)
+			// Wait for the open connection to be ready for work.
+			// TODO add a flag
+			waitCtx, waitCancel := context.WithTimeout(ctx, 2*time.Second)
+			defer waitCancel()
 
-			vtctld.lastPing = time.Now()
+			if err := vtctld.VtctldClient.WaitForReady(waitCtx); err == nil {
+				// The existing connection is still usable, so we're good to go.
+				span.Annotate("is_noop", true)
+				span.Annotate("vtctld_host", vtctld.host)
 
-			return nil
+				log.Infof("Using cached connection to %s", vtctld.host)
+
+				vtctld.lastPing = time.Now()
+
+				return nil
+			}
+			// If WaitForReady does return an error, then fall th rough to close
+			// the cached connection and establish a new one.
 		}
 
+		log.Infof("Closing stale connection to %s", vtctld.host)
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
@@ -120,11 +136,13 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		}
 	}
 
+	log.Infof("Discovering vtctld to dial...")
 	addr, err := vtctld.discovery.DiscoverVtctldAddr(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error discovering vtctld to dial: %w", err)
 	}
 
+	log.Infof("Discovered vtctld %s\n; dialing...", addr)
 	span.Annotate("vtctld_host", addr)
 	span.Annotate("is_using_credentials", vtctld.creds != nil)
 
@@ -144,10 +162,24 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		return err
 	}
 
+	log.Infof("Established a gRPC connection to %s; waiting to transition to READY...", addr)
+
+	// Here, if we can't transition a READY connection to our newly establishled
+	// connection, then fail. An enhancement could be to keep redialing if this happens.
+	waitCtx, waitCancel := context.WithTimeout(ctx, 2*time.Second)
+	defer waitCancel()
+
+	if err := client.WaitForReady(waitCtx); err != nil {
+		log.Infof("Could not transition to READY connection for %s", addr)
+		return fmt.Errorf("could not transition to READY connection for %s", addr)
+	}
+
 	vtctld.dialedAt = time.Now()
 	vtctld.host = addr
 	vtctld.VtctldClient = client
 	vtctld.closed = false
+
+	log.Infof("Established READY connection to vtctld %s\n", addr)
 
 	return nil
 }

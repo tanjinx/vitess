@@ -5,6 +5,12 @@
                 "fqdn": "localhost:15000",
                 "hostname": "localhost:15999"
             }
+        },
+        {
+            "host": {
+                "fqdn": "localhost:16000",
+                "hostname": "localhost:16999"
+            }
         }
     ],
     "vtgates": [
