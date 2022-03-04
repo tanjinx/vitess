@@ -18,8 +18,10 @@ package vtctldclient
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -70,28 +72,32 @@ func TestDial(t *testing.T) {
 
 func TestRedial(t *testing.T) {
 	// Initialize vtctld #1
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	listener1, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
-	defer listener.Close()
-	vtctld := &fakeVtctld{}
-	server := grpc.NewServer()
-	vtctlservicepb.RegisterVtctlServer(server, vtctld)
-	go server.Serve(listener)
-	defer server.Stop()
+	defer listener1.Close()
+
+	vtctld1 := &fakeVtctld{}
+	server1 := grpc.NewServer()
+	vtctlservicepb.RegisterVtctlServer(server1, vtctld1)
+
+	go server1.Serve(listener1)
+	defer server1.Stop()
 
 	// Initialize vtctld #2
 	listener2, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 	defer listener2.Close()
+
 	vtctld2 := &fakeVtctld{}
 	server2 := grpc.NewServer()
 	vtctlservicepb.RegisterVtctlServer(server2, vtctld2)
+
 	go server2.Serve(listener2)
 	defer server2.Stop()
 
 	disco := fakediscovery.New()
 	disco.AddTaggedVtctlds(nil, &vtadminpb.Vtctld{
-		Hostname: listener.Addr().String(),
+		Hostname: listener1.Addr().String(),
 	}, &vtadminpb.Vtctld{
 		Hostname: listener2.Addr().String(),
 	})
@@ -107,11 +113,9 @@ func TestRedial(t *testing.T) {
 	// We don't have a vtctld host until we call Dial
 	require.Empty(t, proxy.host)
 
-	// Check for a successful connection to whichever
-	// vtctld we discover first.
+	// Check for a successful connection to whichever vtctld we discover first.
 	err = proxy.Dial(context.Background())
 	assert.NoError(t, err)
-	assert.Equal(t, listener.Addr().String(), proxy.host)
 
 	// vtadmin's fakediscovery package discovers vtctlds in random order. Rather
 	// than force some cumbersome sequential logic, we can just do a switcheroo
@@ -119,17 +123,24 @@ func TestRedial(t *testing.T) {
 	var nextAddr string
 
 	switch proxy.host {
-	case listener.Addr().String():
-		server.Stop()
+	case listener1.Addr().String():
+		fmt.Printf("Closing vtctld1\n")
+		server1.Stop()
 		nextAddr = listener2.Addr().String()
 
 	case listener2.Addr().String():
+		fmt.Printf("Closing vtctld2\n")
 		server2.Stop()
-		nextAddr = listener.Addr().String()
+		nextAddr = listener1.Addr().String()
 	}
+
+	// Wait for the vtctld to shut down
+	time.Sleep(2 * time.Second)
 
 	err = proxy.Dial(context.Background())
 	assert.NoError(t, err)
+
+	fmt.Printf("dialed %s\n", proxy.host)
 
 	assert.Equal(t, nextAddr, proxy.host)
 }

@@ -26,7 +26,6 @@ import (
 	"google.golang.org/grpc/connectivity"
 
 	"vitess.io/vitess/go/vt/grpcclient"
-	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtctl/grpcclientcommon"
 	"vitess.io/vitess/go/vt/vtctl/vtctldclient"
 
@@ -75,6 +74,8 @@ func NewWithDialOpts(addr string, failFast grpcclient.FailFast, opts ...grpc.Dia
 }
 
 func (client *gRPCVtctldClient) Close() error {
+	fmt.Printf("closing grpcvtctldclient connection!!!!!!!!!\n")
+
 	err := client.cc.Close()
 	if err == nil {
 		client.c = nil
@@ -97,7 +98,7 @@ func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
 		// Wait and check gRPC connectivity
 		default:
 			connState := client.cc.GetState()
-			log.Infof("gRPCVtctldClient ClientConn status: %v", connState.String())
+			fmt.Printf("gRPCVtctldClient ClientConn status: %v\n", connState.String())
 
 			switch connState {
 			// The gRPC connection is ready and usable.
@@ -122,7 +123,7 @@ func (client *gRPCVtctldClient) WaitForReady(ctx context.Context) error {
 					// If the client has failed to transition, fail so that the caller can close the conneciton.
 					return fmt.Errorf("failed to transition from state %s", connState)
 				}
-				log.Infof("Waited for state change, new state: %s", client.cc.GetState().String())
+				fmt.Printf("Waited for state change, new state: %s\n", client.cc.GetState().String())
 				// Continue looping. It's possible we have transitioned to a READY state,
 				// in which case the next loop iteration will return. Same for transitioning
 				// to a SHUTDOWN state. Otherwise, we have transitioned into one of CONNECTING, IDLE, or TRANSIENT_FAILURE,

@@ -26,7 +26,6 @@ import (
 
 	"vitess.io/vitess/go/trace"
 	"vitess.io/vitess/go/vt/grpcclient"
-	"vitess.io/vitess/go/vt/log"
 	"vitess.io/vitess/go/vt/vtadmin/cluster/discovery"
 	"vitess.io/vitess/go/vt/vtadmin/debug"
 	"vitess.io/vitess/go/vt/vtadmin/vtadminproto"
@@ -117,7 +116,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 				span.Annotate("is_noop", true)
 				span.Annotate("vtctld_host", vtctld.host)
 
-				log.Infof("Using cached connection to %s", vtctld.host)
+				fmt.Printf("Using cached connection to %s\n", vtctld.host)
 
 				vtctld.lastPing = time.Now()
 
@@ -127,7 +126,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 			// the cached connection and establish a new one.
 		}
 
-		log.Infof("Closing stale connection to %s", vtctld.host)
+		fmt.Printf("Closing stale connection to %s\n", vtctld.host)
 		span.Annotate("is_stale", true)
 
 		// close before reopen. this is safe to call on an already-closed client.
@@ -136,13 +135,13 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		}
 	}
 
-	log.Infof("Discovering vtctld to dial...")
+	fmt.Printf("Discovering vtctld to dial...")
 	addr, err := vtctld.discovery.DiscoverVtctldAddr(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("error discovering vtctld to dial: %w", err)
 	}
 
-	log.Infof("Discovered vtctld %s\n; dialing...", addr)
+	fmt.Printf("Discovered vtctld %s\n; dialing...", addr)
 	span.Annotate("vtctld_host", addr)
 	span.Annotate("is_using_credentials", vtctld.creds != nil)
 
@@ -162,7 +161,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 		return err
 	}
 
-	log.Infof("Established a gRPC connection to %s; waiting to transition to READY...", addr)
+	fmt.Printf("Established a gRPC connection to %s; waiting to transition to READY...\n", addr)
 
 	// Here, if we can't transition a READY connection to our newly establishled
 	// connection, then fail. An enhancement could be to keep redialing if this happens.
@@ -170,7 +169,7 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	defer waitCancel()
 
 	if err := client.WaitForReady(waitCtx); err != nil {
-		log.Infof("Could not transition to READY connection for %s", addr)
+		fmt.Printf("Could not transition to READY connection for %s\n", addr)
 		return fmt.Errorf("could not transition to READY connection for %s", addr)
 	}
 
@@ -179,13 +178,14 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 	vtctld.VtctldClient = client
 	vtctld.closed = false
 
-	log.Infof("Established READY connection to vtctld %s\n", addr)
+	fmt.Printf("Established READY connection to vtctld %s\n", addr)
 
 	return nil
 }
 
 // Close is part of the Proxy interface.
 func (vtctld *ClientProxy) Close() error {
+	fmt.Printf("closing")
 	if vtctld.VtctldClient == nil {
 		vtctld.closed = true
 
@@ -194,6 +194,7 @@ func (vtctld *ClientProxy) Close() error {
 
 	err := vtctld.VtctldClient.Close()
 	if err != nil {
+		fmt.Printf("an error when closing")
 		return err
 	}
 
