@@ -18,7 +18,6 @@ package vtctldclient
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -120,27 +119,30 @@ func TestRedial(t *testing.T) {
 	// vtadmin's fakediscovery package discovers vtctlds in random order. Rather
 	// than force some cumbersome sequential logic, we can just do a switcheroo
 	// here in the test.
+	var currentVtctld *grpc.Server
 	var nextAddr string
 
 	switch proxy.host {
 	case listener1.Addr().String():
-		fmt.Printf("Closing vtctld1\n")
-		server1.Stop()
+		currentVtctld = server1
 		nextAddr = listener2.Addr().String()
 
 	case listener2.Addr().String():
-		fmt.Printf("Closing vtctld2\n")
-		server2.Stop()
+		currentVtctld = server2
 		nextAddr = listener1.Addr().String()
+	default:
+		t.Fatalf("invalid proxy host %s", proxy.host)
 	}
+
+	// Force an ungraceful shutdown of the gRPC server to which we're connected
+	currentVtctld.Stop()
 
 	// Wait for the vtctld to shut down
 	time.Sleep(2 * time.Second)
 
+	// Finally, check that we've established a connection
+	// to the remaining vtctld.
 	err = proxy.Dial(context.Background())
 	assert.NoError(t, err)
-
-	fmt.Printf("dialed %s\n", proxy.host)
-
 	assert.Equal(t, nextAddr, proxy.host)
 }
