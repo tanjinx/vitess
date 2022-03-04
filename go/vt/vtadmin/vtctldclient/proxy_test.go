@@ -94,6 +94,7 @@ func TestRedial(t *testing.T) {
 	go server2.Serve(listener2)
 	defer server2.Stop()
 
+	// Register both vtctlds with VTAdmin
 	disco := fakediscovery.New()
 	disco.AddTaggedVtctlds(nil, &vtadminpb.Vtctld{
 		Hostname: listener1.Addr().String(),
@@ -101,6 +102,7 @@ func TestRedial(t *testing.T) {
 		Hostname: listener2.Addr().String(),
 	})
 
+	// Initialize our gRPC vtctld client proxy
 	proxy := New(&Config{
 		Cluster: &vtadminpb.Cluster{
 			Id:   "test",
