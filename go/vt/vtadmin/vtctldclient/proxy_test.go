@@ -69,6 +69,45 @@ func TestDial(t *testing.T) {
 	assert.Equal(t, listener.Addr().String(), proxy.host)
 }
 
+func TestClose(t *testing.T) {
+	// Initialize the gRPC vtctld server
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+
+	defer listener.Close()
+
+	vtctld := &fakeVtctld{}
+	server := grpc.NewServer()
+	vtctlservicepb.RegisterVtctlServer(server, vtctld)
+
+	go server.Serve(listener)
+	defer server.Stop()
+
+	disco := fakediscovery.New()
+	disco.AddTaggedVtctlds(nil, &vtadminpb.Vtctld{
+		Hostname: listener.Addr().String(),
+	})
+
+	proxy := New(&Config{
+		Cluster: &vtadminpb.Cluster{
+			Id:   "test",
+			Name: "testcluster",
+		},
+		Discovery: disco,
+	})
+
+	// We don't have a vtctld host until we call Dial
+	require.Empty(t, proxy.host)
+
+	err = proxy.Dial(context.Background())
+	assert.NoError(t, err)
+	assert.Equal(t, listener.Addr().String(), proxy.host)
+
+	err = proxy.Close()
+	assert.NoError(t, err)
+	assert.True(t, proxy.closed)
+}
+
 func TestRedial(t *testing.T) {
 	// Initialize vtctld #1
 	listener1, err := net.Listen("tcp", "127.0.0.1:0")

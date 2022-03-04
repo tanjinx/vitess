@@ -185,7 +185,6 @@ func (vtctld *ClientProxy) Dial(ctx context.Context) error {
 
 // Close is part of the Proxy interface.
 func (vtctld *ClientProxy) Close() error {
-	fmt.Printf("closing")
 	if vtctld.VtctldClient == nil {
 		vtctld.closed = true
 
@@ -194,7 +193,7 @@ func (vtctld *ClientProxy) Close() error {
 
 	err := vtctld.VtctldClient.Close()
 	if err != nil {
-		fmt.Printf("an error when closing")
+		fmt.Printf("an error when closing~~~~~~~~~~~~~\n\n\n\n\n")
 		return err
 	}
 
