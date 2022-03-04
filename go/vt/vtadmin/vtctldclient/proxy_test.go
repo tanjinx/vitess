@@ -18,9 +18,9 @@ package vtctldclient
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -118,9 +118,6 @@ func TestRedial(t *testing.T) {
 	server1 := grpc.NewServer()
 	vtctlservicepb.RegisterVtctlServer(server1, vtctld1)
 
-	go server1.Serve(listener1)
-	defer server1.Stop()
-
 	// Initialize vtctld #2
 	listener2, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
@@ -130,7 +127,22 @@ func TestRedial(t *testing.T) {
 	server2 := grpc.NewServer()
 	vtctlservicepb.RegisterVtctlServer(server2, vtctld2)
 
-	go server2.Serve(listener2)
+	result := make(chan error, 1)
+
+	go func() {
+		res := server1.Serve(listener1)
+		fmt.Printf("listener1 shut down")
+		result <- res
+	}()
+
+	defer server1.Stop()
+
+	go func() {
+		res := server2.Serve(listener2)
+		fmt.Printf("listener2 shut down")
+		result <- res
+	}()
+
 	defer server2.Stop()
 
 	// Register both vtctlds with VTAdmin
@@ -165,24 +177,48 @@ func TestRedial(t *testing.T) {
 
 	switch proxy.host {
 	case listener1.Addr().String():
+		fmt.Println("closing listener1")
 		currentVtctld = server1
 		nextAddr = listener2.Addr().String()
 
 	case listener2.Addr().String():
+		fmt.Println("closing listener2")
 		currentVtctld = server2
 		nextAddr = listener1.Addr().String()
 	default:
 		t.Fatalf("invalid proxy host %s", proxy.host)
 	}
 
+	// Remove the shut down vtctld from VTAdmin's service discovery (clumsily).
+	// Otherwise, when redialing, we may redial the vtctld that we just shut down.
+	disco.Clear()
+	disco.AddTaggedVtctlds(nil, &vtadminpb.Vtctld{
+		Hostname: nextAddr,
+	})
+
 	// Force an ungraceful shutdown of the gRPC server to which we're connected
 	currentVtctld.Stop()
 
-	// Wait for the vtctld to shut down
-	time.Sleep(2 * time.Second)
+	// Give the client connection (and socket) a chance to propagate; if we redial too quickly,
+	// the client connection to the vtctld still registers as READY.
+	// TODO can we use the connectivity API here as well?? I think we can actually check that
+	// the server started with serve returns
+	// time.Sleep(500 * time.Millisecond)
+	// select {
+	// case <-result:
+	// 	fmt.Printf("done\n\n\n\n")
+	// default:
+	// 	fmt.Printf("sleeping\n\n")
+	// 	time.Sleep(500 * time.Millisecond)
+	// }
 
-	// Finally, check that we've established a connection
-	// to the remaining vtctld.
+	// Block until we receive a shutdown from the server
+	fmt.Printf("\n\nblocking......\n\n")
+	<-result
+
+	fmt.Printf("result: %+v", result)
+
+	// Finally, check that dial + establish a connection to the remaining vtctld.
 	err = proxy.Dial(context.Background())
 	assert.NoError(t, err)
 	assert.Equal(t, nextAddr, proxy.host)

@@ -75,6 +75,8 @@ func NewWithDialOpts(addr string, failFast grpcclient.FailFast, opts ...grpc.Dia
 
 // Close is part of the vtctldclient.VtctldClient interface.
 func (client *gRPCVtctldClient) Close() error {
+	fmt.Printf("closing!!!!\n")
+
 	err := client.cc.Close()
 	if err == nil {
 		client.c = nil
