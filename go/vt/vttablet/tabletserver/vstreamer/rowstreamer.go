@@ -201,7 +201,7 @@ func (rs *rowStreamer) buildSelect() (string, error) {
 		prefix = ", "
 	}
 
-	buf.Myprintf("LIMIT 100000")
+	buf.Myprintf("LIMIT 1000000")
 	return buf.String(), nil
 }
 
