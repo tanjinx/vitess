@@ -262,9 +262,9 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			return err
 		}
 		if row == nil {
-			// Since a LIMIT may have been used we can
-			// only guarantee a VStreamResponse is done
-			// if rows == nil on the first call
+			// Can only guarantee we are done with
+			// the stream when row == nil on the first
+			// iteration
 			response.Done = firstIteration
 			break
 		}
@@ -311,7 +311,6 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			return err
 		}
 	} else {
-		response.Done = true
 		send(response)
 	}
 
