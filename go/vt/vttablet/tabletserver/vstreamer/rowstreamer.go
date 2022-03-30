@@ -236,8 +236,12 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	}
 
 	response := &binlogdatapb.VStreamRowsResponse{}
+	response.Done = false
+
 	lastpk := make([]sqltypes.Value, len(rs.pkColumns))
 	byteCount := 0
+	firstIteration := true
+
 	for {
 		//log.Infof("StreamResponse for loop iteration starts")
 		select {
@@ -253,10 +257,15 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 		}
 
 		row, err := conn.FetchNext()
+
 		if err != nil {
 			return err
 		}
 		if row == nil {
+			// Since a LIMIT may have been used we can
+			// only guarantee a VStreamResponse is done
+			// if rows == nil on the first call
+			response.Done = firstIteration
 			break
 		}
 		// Compute lastpk here, because we'll need it
@@ -291,6 +300,7 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			response.Rows = nil
 			byteCount = 0
 		}
+		firstIteration = false
 	}
 
 	if len(response.Rows) > 0 {
