@@ -229,6 +229,7 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 		Fields:   rs.plan.fields(),
 		Pkfields: pkfields,
 		Gtid:     gtid,
+		Done:     false,
 	})
 	if err != nil {
 		return fmt.Errorf("stream send error: %v", err)
@@ -299,6 +300,9 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 		if err != nil {
 			return err
 		}
+	} else {
+		response.Done = true
+		send(response)
 	}
 
 	return nil

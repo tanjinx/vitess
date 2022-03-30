@@ -220,6 +220,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	var pkfields []*querypb.Field
 	var updateCopyState *sqlparser.ParsedQuery
 	var bv map[string]*querypb.BindVariable
+
 	err = vc.vr.sourceVStreamer.VStreamRows(ctx, initialPlan.SendRule.Filter, lastpkpb, func(rows *binlogdatapb.VStreamRowsResponse) error {
 		for {
 			select {
@@ -307,6 +308,15 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 		if err := vc.vr.dbClient.Commit(); err != nil {
 			return err
 		}
+
+		if rows.Done {
+			log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
+			buf := sqlparser.NewTrackedBuffer(nil)
+			buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
+			if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 	// If there was a timeout, return without an error.
@@ -319,12 +329,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	if err != nil {
 		return err
 	}
-	log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
-	buf := sqlparser.NewTrackedBuffer(nil)
-	buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
-	if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
-		return err
-	}
+
 	return nil
 }
 
