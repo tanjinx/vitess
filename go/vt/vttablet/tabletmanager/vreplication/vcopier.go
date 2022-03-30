@@ -254,6 +254,18 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			buf.Myprintf("update _vt.copy_state set lastpk=%a where vrepl_id=%s and table_name=%s", ":lastpk", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
 			updateCopyState = buf.ParsedQuery()
 		}
+
+		if rows.Done {
+			log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
+			buf := sqlparser.NewTrackedBuffer(nil)
+			buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
+			if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
 		if len(rows.Rows) == 0 {
 			return nil
 		}
@@ -309,14 +321,6 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			return err
 		}
 
-		if rows.Done {
-			log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
-			buf := sqlparser.NewTrackedBuffer(nil)
-			buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
-			if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
-				return err
-			}
-		}
 		return nil
 	})
 	// If there was a timeout, return without an error.
