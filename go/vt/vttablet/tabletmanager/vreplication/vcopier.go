@@ -334,8 +334,6 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 		if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
 			return err
 		}
-
-		return nil
 	}
 
 	return nil
