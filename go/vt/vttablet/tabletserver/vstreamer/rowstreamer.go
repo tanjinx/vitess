@@ -236,7 +236,6 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	}
 
 	response := &binlogdatapb.VStreamRowsResponse{}
-	response.Done = false
 
 	lastpk := make([]sqltypes.Value, len(rs.pkColumns))
 	byteCount := 0
@@ -306,12 +305,11 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	if len(response.Rows) > 0 {
 		rs.vse.rowStreamerNumRows.Add(int64(len(response.Rows)))
 		response.Lastpk = sqltypes.RowToProto3(lastpk)
-		err = send(response)
-		if err != nil {
-			return err
-		}
-	} else {
-		send(response)
+	}
+
+	err = send(response)
+	if err != nil {
+		return err
 	}
 
 	return nil
