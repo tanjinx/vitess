@@ -32,6 +32,7 @@ type Lang = 'json' | 'sql';
 
 hljs.registerLanguage(Language.JSON, hljsJSON);
 hljs.registerLanguage(Language.SQL, hljsSQL);
+
 interface Props {
     code?: string | null | undefined;
     language?: Language | Lang | null | undefined;
@@ -67,6 +68,7 @@ export const Code = ({ code, language }: Props) => {
                 {codeLines.map((l: any, i: number) => {
                     return (
                         <tr key={i}>
+                            {/* Use a pseudoelement for text contents to omit from user selection */}
                             <td className={style.lineNumber} data-line-number={i} id={`L${i}`} />
                             <td className={style.code}>
                                 <code>{l}</code>
