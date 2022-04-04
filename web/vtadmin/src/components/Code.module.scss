@@ -54,3 +54,11 @@
     tab-size: 8;
     white-space: pre;
 }
+
+:global .hljs-built_in,
+:global .hljs-keyword,
+:global .hljs-number,
+:global .hljs-string,
+:global .hljs-type {
+    color: theme('colors.gray.800');
+}

@@ -113,7 +113,7 @@ export const Schema = () => {
                     <div className={style.container}>
                         <section className={style.panel}>
                             <h3 className="my-8">Table Definition</h3>
-                            <Code code={tableDefinition.schema} />
+                            <Code code={tableDefinition.schema} language="sql" />
                         </section>
 
                         {!!tableVindexes.length && (
