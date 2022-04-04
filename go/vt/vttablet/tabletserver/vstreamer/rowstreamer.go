@@ -304,9 +304,9 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 
 	if len(response.Rows) > 0 {
 		rs.vse.rowStreamerNumRows.Add(int64(len(response.Rows)))
-		response.Lastpk = sqltypes.RowToProto3(lastpk)
 	}
 
+	response.Lastpk = sqltypes.RowToProto3(lastpk)
 	err = send(response)
 	if err != nil {
 		return err
