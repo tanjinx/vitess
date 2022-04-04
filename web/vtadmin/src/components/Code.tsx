@@ -58,6 +58,7 @@ export const Code = ({ code, language }: Props) => {
         acc[ln].push(l);
         return acc;
     }, []);
+
     const codeLines = lines.map((l: any) => l.map(mapWithDepth(0)));
 
     return (
@@ -65,7 +66,7 @@ export const Code = ({ code, language }: Props) => {
             <tbody>
                 {codeLines.map((l: any, i: number) => {
                     return (
-                        <tr>
+                        <tr key={i}>
                             <td className={style.lineNumber} data-line-number={i} id={`L${i}`} />
                             <td className={style.code}>
                                 <code>{l}</code>
