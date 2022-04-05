@@ -30,6 +30,7 @@
 .lineNumber {
     box-sizing: border-box;
     color: var(--textColorSecondary);
+    cursor: pointer;
     font-family: var(--fontFamilyMonospace);
     font-size: theme('fontSize.base');
     line-height: 2.4rem;
@@ -42,15 +43,25 @@
     width: 1%;
 }
 
+.lineNumber:hover {
+    color: var(--textColorPrimary);
+}
+
 .lineNumber::before {
     content: attr(data-line-number);
 }
 
 .code {
+    border-left: solid 2px transparent !important;
     font-family: var(--fontFamilyMonospace);
     font-size: theme('fontSize.base');
     line-height: 2.4rem;
-    padding: 0 1.2rem;
+    padding: 0 1rem;
     tab-size: 8;
     white-space: pre;
+}
+
+.highlighted {
+    border-left-color: theme('colors.warning.DEFAULT') !important;
+    @apply bg-warning-50/25;
 }
