@@ -18,6 +18,7 @@ package vstreamer
 
 import (
 	"context"
+	"flag"
 	"fmt"
 
 	"vitess.io/vitess/go/sqltypes"
@@ -30,6 +31,8 @@ import (
 	binlogdatapb "vitess.io/vitess/go/vt/proto/binlogdata"
 	querypb "vitess.io/vitess/go/vt/proto/query"
 )
+
+var vrepRowstreamerLimit = flag.Int64("vreplication_rowstreamer_limit", -1, "Introduces the specified LIMIT to the rowstreamer's queries. A negative value equates to no LIMIT.")
 
 // RowStreamer exposes an externally usable interface to rowStreamer.
 type RowStreamer interface {
@@ -201,7 +204,9 @@ func (rs *rowStreamer) buildSelect() (string, error) {
 		prefix = ", "
 	}
 
-	buf.Myprintf(" LIMIT 1000000")
+	if *vrepRowstreamerLimit > int64(0) {
+		buf.Myprintf(" LIMIT %d", *vrepRowstreamerLimit)
+	}
 	return buf.String(), nil
 }
 
