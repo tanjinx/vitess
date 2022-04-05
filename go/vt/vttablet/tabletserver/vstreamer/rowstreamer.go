@@ -205,7 +205,8 @@ func (rs *rowStreamer) buildSelect() (string, error) {
 	}
 
 	if *vrepRowstreamerLimit > int64(0) {
-		buf.Myprintf(" LIMIT %d", *vrepRowstreamerLimit)
+		limit := fmt.Sprintf(" LIMIT %d", *vrepRowstreamerLimit)
+		buf.Myprintf(limit)
 	}
 	return buf.String(), nil
 }
