@@ -266,6 +266,8 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 		return nil
 	}
 
+	log.Infof("buffered binlog events: %d", len(bufferedEvents))
+
 	// Main loop: calls bufferAndTransmit as events arrive.
 	timer := time.NewTimer(HeartbeatTime)
 	defer timer.Stop()
