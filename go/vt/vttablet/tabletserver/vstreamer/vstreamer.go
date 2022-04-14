@@ -290,6 +290,8 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 			}
 		}
 	}()
+
+	var eventCount int
 	for {
 		timer.Reset(HeartbeatTime)
 		// Drain event if timer fired before reset.
@@ -309,13 +311,14 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				return fmt.Errorf("unexpected server EOF")
 			}
 			vevents, err := vs.parseEvent(ev)
+			eventCount += len(vevents)
 			log.Infof("parsed binlog events: %d", len(vevents))
 			if err != nil {
 				vs.vse.errorCounts.Add("ParseEvent", 1)
 				return err
 			}
 			for _, vevent := range vevents {
-				log.Infof("sending binlog event: %v", vevent)
+				log.Infof("sending binlog event: %v", vevent.Type)
 				if err := bufferAndTransmit(vevent); err != nil {
 					if err == io.EOF {
 						return nil
@@ -333,7 +336,7 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 			// Increment this counter for testing.
 			vschemaUpdateCount.Add(1)
 		case <-ctx.Done():
-			log.Infof("context is done")
+			log.Infof("context is done, events %d", eventCount)
 			return nil
 		case <-timer.C:
 			log.Infof("sending heartbeat")
