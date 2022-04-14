@@ -311,8 +311,13 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				return fmt.Errorf("unexpected server EOF")
 			}
 			vevents, err := vs.parseEvent(ev)
-			eventCount += len(vevents)
-			log.Infof("parsed binlog events: %d", len(vevents))
+			
+			n := len(vevents)
+			if n > 0 {
+				eventCount += len(vevents)
+				log.Infof("parsed binlog events: %d", len(vevents))
+			}
+
 			if err != nil {
 				vs.vse.errorCounts.Add("ParseEvent", 1)
 				return err
