@@ -144,6 +144,7 @@ func (vs *vstreamer) SetVSchema(vschema *localVSchema) {
 
 // Cancel stops the streaming.
 func (vs *vstreamer) Cancel() {
+	log.Infof("Cancelling stream %v", vs.filter.String())
 	vs.cancel()
 }
 
@@ -311,7 +312,7 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				return fmt.Errorf("unexpected server EOF")
 			}
 			vevents, err := vs.parseEvent(ev)
-			
+
 			n := len(vevents)
 			if n > 0 {
 				eventCount += len(vevents)
