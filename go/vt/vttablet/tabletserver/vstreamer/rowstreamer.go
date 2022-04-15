@@ -252,6 +252,8 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 		select {
 		case <-rs.ctx.Done():
 			log.Infof("Stream ended because of ctx.Done")
+			log.Infof("Number of Cancelled Rows: %v\n", len(response.Rows))
+			log.Infof("GTID's Cancelled: %v\n", response.Gtid)
 			return fmt.Errorf("stream ended: %v", rs.ctx.Err())
 		default:
 		}
@@ -313,8 +315,8 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	}
 
 	response.Lastpk = sqltypes.RowToProto3(lastpk)
-	fmt.Printf("Number of Rows: %v\n", len(response.Rows))
-	fmt.Printf("GTID: %v\n", response.Gtid)
+	log.Infof("Number of Rows: %v\n", len(response.Rows))
+	log.Infof("GTID: %v\n", response.Gtid)
 	err = send(response)
 	if err != nil {
 		return err
