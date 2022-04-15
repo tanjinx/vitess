@@ -313,6 +313,8 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	}
 
 	response.Lastpk = sqltypes.RowToProto3(lastpk)
+	fmt.Printf("Number of Rows: %v\n", len(response.Rows))
+	fmt.Printf("GTID: %v\n", response.Gtid)
 	err = send(response)
 	if err != nil {
 		return err
