@@ -20,6 +20,7 @@ import (
 	"io"
 	"sync"
 	"time"
+	"vitess.io/vitess/go/vt/log"
 
 	"context"
 
@@ -70,11 +71,13 @@ func (rl *relayLog) Send(events []*binlogdatapb.VEvent) error {
 	defer rl.mu.Unlock()
 
 	if err := rl.checkDone(); err != nil {
+		log.Infof("rl1 %v", err)
 		return err
 	}
 	for rl.curSize > rl.maxSize || len(rl.items) >= rl.maxItems {
 		rl.canAccept.Wait()
 		if err := rl.checkDone(); err != nil {
+			log.Infof("rl2 %v", err)
 			return err
 		}
 	}
