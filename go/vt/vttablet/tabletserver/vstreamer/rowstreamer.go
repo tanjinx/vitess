@@ -18,6 +18,7 @@ package vstreamer
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"time"
 
@@ -31,6 +32,8 @@ import (
 	binlogdatapb "vitess.io/vitess/go/vt/proto/binlogdata"
 	querypb "vitess.io/vitess/go/vt/proto/query"
 )
+
+var vrepRowstreamerLimit = flag.Int64("vreplication_rowstreamer_limit", -1, "Introduces the specified LIMIT to the rowstreamer's queries. A negative value equates to no LIMIT.")
 
 // RowStreamer exposes an externally usable interface to rowStreamer.
 type RowStreamer interface {
@@ -207,6 +210,12 @@ func (rs *rowStreamer) buildSelect() (string, error) {
 		buf.Myprintf("%s%v", prefix, sqlparser.NewColIdent(rs.plan.Table.Fields[pk].Name))
 		prefix = ", "
 	}
+
+	if *vrepRowstreamerLimit > int64(0) {
+		limit := fmt.Sprintf(" LIMIT %d", *vrepRowstreamerLimit)
+		buf.Myprintf(limit)
+	}
+
 	return buf.String(), nil
 }
 
@@ -247,10 +256,14 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 	filtered := make([]sqltypes.Value, len(rs.plan.ColExprs))
 	lastpk := make([]sqltypes.Value, len(rs.pkColumns))
 	byteCount := 0
+	firstIteration := true
+
 	for {
 		//log.Infof("StreamResponse for loop iteration starts")
 		if rs.ctx.Err() != nil {
 			log.Infof("Stream ended because of ctx.Done")
+			log.Infof("Number of Cancelled Rows: %v\n", len(response.Rows))
+			log.Infof("GTID's Cancelled: %v\n", response.Gtid)
 			return fmt.Errorf("stream ended: %v", rs.ctx.Err())
 		}
 
@@ -267,6 +280,7 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			return err
 		}
 		if mysqlrow == nil {
+			response.Done = firstIteration
 			break
 		}
 		// Compute lastpk here, because we'll need it
@@ -304,7 +318,11 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			rowCount = 0
 			byteCount = 0
 		}
+		firstIteration = false
 	}
+
+	log.Infof("Number of Rows: %v\n", len(response.Rows))
+	log.Infof("GTID: %v\n", response.Gtid)
 
 	if rowCount > 0 {
 		response.Rows = rows[:rowCount]

@@ -137,6 +137,7 @@ func (vs *vstreamer) SetVSchema(vschema *localVSchema) {
 
 // Cancel stops the streaming.
 func (vs *vstreamer) Cancel() {
+	log.Infof("Cancelling stream %v", vs.filter.String())
 	vs.cancel()
 }
 
@@ -298,6 +299,7 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 
 		}
 	}()
+	var eventCount int
 	for {
 		timer.Reset(HeartbeatTime)
 		// Drain event if timer fired before reset.
@@ -317,11 +319,18 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				return fmt.Errorf("unexpected server EOF")
 			}
 			vevents, err := vs.parseEvent(ev)
+
+			n := len(vevents)
+			if n > 0 {
+				eventCount += len(vevents)
+				log.Infof("parsed binlog events: %d", len(vevents))
+			}
 			if err != nil {
 				vs.vse.errorCounts.Add("ParseEvent", 1)
 				return err
 			}
 			for _, vevent := range vevents {
+				log.Infof("sending binlog event: %v", vevent.Type)
 				if err := bufferAndTransmit(vevent); err != nil {
 					if err == io.EOF {
 						return nil
@@ -331,14 +340,17 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				}
 			}
 		case vs.vschema = <-vs.vevents:
+			log.Infof("vschema update")
 			if err := vs.rebuildPlans(); err != nil {
 				return err
 			}
 			// Increment this counter for testing.
 			vschemaUpdateCount.Add(1)
 		case <-ctx.Done():
+			log.Infof("context is done, events %d", eventCount)
 			return nil
 		case <-timer.C:
+			log.Infof("sending heartbeat")
 			now := time.Now().UnixNano()
 			if err := bufferAndTransmit(&binlogdatapb.VEvent{
 				Type:        binlogdatapb.VEventType_HEARTBEAT,

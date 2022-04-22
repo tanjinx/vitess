@@ -416,6 +416,7 @@ message VStreamRowsResponse {
   string gtid = 3;
   repeated query.Row rows = 4;
   query.Row lastpk = 5;
+  bool done = 6;
 }
 
 message LastPKEvent {

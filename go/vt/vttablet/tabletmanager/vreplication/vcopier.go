@@ -225,6 +225,8 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	var updateCopyState *sqlparser.ParsedQuery
 	var bv map[string]*querypb.BindVariable
 	var sqlbuffer bytes2.Buffer
+	var shouldDrop bool
+
 	err = vc.vr.sourceVStreamer.VStreamRows(ctx, initialPlan.SendRule.Filter, lastpkpb, func(rows *binlogdatapb.VStreamRowsResponse) error {
 		for {
 			select {
@@ -240,6 +242,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 				break
 			}
 		}
+		shouldDrop = rows.Done
 		if vc.tablePlan == nil {
 			if len(rows.Fields) == 0 {
 				return fmt.Errorf("expecting field event first, got: %v", rows)
@@ -260,6 +263,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			buf.Myprintf("update _vt.copy_state set lastpk=%a where vrepl_id=%s and table_name=%s", ":lastpk", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
 			updateCopyState = buf.ParsedQuery()
 		}
+		log.Infof("rows to copy: %d, gtid: %s", len(rows.Rows), rows.Gtid)
 		if len(rows.Rows) == 0 {
 			return nil
 		}
@@ -274,6 +278,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 		}
 		_, err = vc.tablePlan.applyBulkInsert(&sqlbuffer, rows, func(sql string) (*sqltypes.Result, error) {
 			start := time.Now()
+			log.Infof("ApplyBulkInsert: %s", sql)
 			qr, err := vc.vr.dbClient.ExecuteWithRetry(ctx, sql)
 			if err != nil {
 				return nil, err
@@ -324,11 +329,14 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	if err != nil {
 		return err
 	}
-	log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
-	buf := sqlparser.NewTrackedBuffer(nil)
-	buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
-	if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
-		return err
+
+	if shouldDrop {
+		log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
+		buf := sqlparser.NewTrackedBuffer(nil)
+		buf.Myprintf("delete from _vt.copy_state where vrepl_id=%s and table_name=%s", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
+		if _, err := vc.vr.dbClient.Execute(buf.String()); err != nil {
+			return err
+		}
 	}
 	return nil
 }
