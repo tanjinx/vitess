@@ -280,6 +280,7 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			return err
 		}
 		if mysqlrow == nil {
+			log.Infof("Row is nil on first iteration: %v", firstIteration)
 			response.Done = firstIteration
 			break
 		}
@@ -309,6 +310,9 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			rs.vse.rowStreamerNumPackets.Add(int64(1))
 
 			startSend := time.Now()
+			log.Infof("Should Send")
+			log.Infof("GTID: %v\n", response.Gtid)
+			log.Infof("Number of Rows: %v\n", len(response.Rows))
 			err = send(&response)
 			if err != nil {
 				log.Infof("Rowstreamer send returned error %v", err)
