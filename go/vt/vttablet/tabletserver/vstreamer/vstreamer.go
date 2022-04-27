@@ -323,14 +323,14 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 			n := len(vevents)
 			if n > 0 {
 				eventCount += len(vevents)
-				log.Infof("parsed binlog events: %d", len(vevents))
+				log.V(11).Infof("parsed binlog events: %d", len(vevents))
 			}
 			if err != nil {
 				vs.vse.errorCounts.Add("ParseEvent", 1)
 				return err
 			}
 			for _, vevent := range vevents {
-				log.Infof("sending binlog event: %v", vevent.Type)
+				log.V(11).Infof("sending binlog event: %v", vevent.Type)
 				if err := bufferAndTransmit(vevent); err != nil {
 					if err == io.EOF {
 						return nil
@@ -340,17 +340,17 @@ func (vs *vstreamer) parseEvents(ctx context.Context, events <-chan mysql.Binlog
 				}
 			}
 		case vs.vschema = <-vs.vevents:
-			log.Infof("vschema update")
+			log.V(11).Infof("vschema update")
 			if err := vs.rebuildPlans(); err != nil {
 				return err
 			}
 			// Increment this counter for testing.
 			vschemaUpdateCount.Add(1)
 		case <-ctx.Done():
-			log.Infof("context is done, events %d", eventCount)
+			log.V(11).Infof("context is done, events %d", eventCount)
 			return nil
 		case <-timer.C:
-			log.Infof("sending heartbeat")
+			log.V(11).Infof("sending heartbeat")
 			now := time.Now().UnixNano()
 			if err := bufferAndTransmit(&binlogdatapb.VEvent{
 				Type:        binlogdatapb.VEventType_HEARTBEAT,
