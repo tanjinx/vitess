@@ -320,6 +320,7 @@ func (be *XtrabackupEngine) backupFiles(ctx context.Context, params BackupParams
 				capture = true
 			}
 			fmt.Fprintln(posBuilder, line)
+			fmt.Fprintln(stderrBuilder, line)
 		}
 		if err := scanner.Err(); err != nil {
 			params.Logger.Errorf("error reading from xtrabackup stderr: %v", err)
