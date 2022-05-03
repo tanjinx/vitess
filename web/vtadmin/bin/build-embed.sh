@@ -45,3 +45,4 @@ BUILD_PATH="$build_path" \
 
 rm -rf "$dest_path"
 mv "$build_path" "$dest_path"
+rm -rf "$build_path"
