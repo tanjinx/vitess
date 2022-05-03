@@ -341,6 +341,8 @@ func (vp *vplayer) applyEvents(ctx context.Context, relay *relayLog) error {
 		}
 
 		items, err := relay.Fetch()
+		log.V(3).Infof("applyEvents: %d items fetched", len(items))
+
 		if err != nil {
 			return err
 		}
@@ -402,6 +404,8 @@ func (vp *vplayer) applyEvents(ctx context.Context, relay *relayLog) error {
 				}
 			}
 		}
+		log.V(3).Infof("%d events applied", len(items))
+
 		if sbm >= 0 {
 			vp.vr.stats.SecondsBehindMaster.Set(sbm)
 			vp.vr.stats.VReplicationLags.Add(strconv.Itoa(int(vp.vr.id)), time.Duration(sbm)*time.Second)
