@@ -1,0 +1,2 @@
+# Mark vtadmin-web build files as "generated" in GitHub
+go/vt/vtadmin/web/build/** linguist-generated=true
