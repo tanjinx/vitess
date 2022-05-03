@@ -308,6 +308,7 @@ func (be *XtrabackupEngine) backupFiles(ctx context.Context, params BackupParams
 		capture := false
 		for scanner.Scan() {
 			line := scanner.Text()
+			fmt.Fprintln(stderrBuilder, line)
 			params.Logger.Infof("xtrabackup stderr: %s", line)
 
 			// Wait until we see the first line of the binlog position.
@@ -320,7 +321,6 @@ func (be *XtrabackupEngine) backupFiles(ctx context.Context, params BackupParams
 				capture = true
 			}
 			fmt.Fprintln(posBuilder, line)
-			fmt.Fprintln(stderrBuilder, line)
 		}
 		if err := scanner.Err(); err != nil {
 			params.Logger.Errorf("error reading from xtrabackup stderr: %v", err)
