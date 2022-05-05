@@ -29,8 +29,7 @@ second_output=$(git status --porcelain -- "$ignores")
 
 diff=$(diff <( echo "$first_output") <( echo "$second_output"))
 
-
-if [["$diff" != ""]]; then
+if [[ "$diff" != "" ]]; then
     echo "ERROR: Embedded front-end build does not match the generated build."
     echo "Please run 'make vtadmin_web_embed' and commit the changes."
     echo -e "List of files containing differences:\n$diff"
