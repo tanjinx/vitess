@@ -5,12 +5,12 @@ name: vtadmin-web embed check
 on:
     push:
         paths:
-            - '.github/workflows/vtadmin_web_build.yml'
+            - '.github/workflows/vtadmin_web_embed_check.yml'
             - 'go/vt/vtadmin/web'
             - 'web/vtadmin/**'
     pull_request:
         paths:
-            - '.github/workflows/vtadmin_web_build.yml'
+            - '.github/workflows/vtadmin_web_embed_check.yml'
             - 'go/vt/vtadmin/web'
             - 'web/vtadmin/**'
 
