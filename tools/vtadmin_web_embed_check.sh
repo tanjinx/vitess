@@ -32,6 +32,8 @@ diff=$(diff <( echo "$first_output") <( echo "$second_output"))
 if [[ "$diff" != "" ]]; then
     echo "ERROR: Embedded front-end build does not match the generated build."
     echo "Please run 'make vtadmin_web_embed' and commit the changes."
-    echo -e "List of files containing differences:\n$diff"
+
+    git diff 
+    
     exit 1
 fi
