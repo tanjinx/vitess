@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 
 	"vitess.io/vitess/go/sqltypes"
@@ -35,6 +36,8 @@ import (
 
 var vrepRowstreamerLimit = flag.Int64("vreplication_rowstreamer_limit", -1, "Introduces the specified LIMIT to the rowstreamer's queries. A negative value equates to no LIMIT.")
 var vrepRowstreamerMaxCriteria = flag.Int("vreplication_rowstreamer_max_criteria", 0, "Max number of criteria the rowstreamer will unwrap in case of composite primary keys. Zero means the number of critera will match the number of columns in the composite key (default Vitess behaviour).")
+var vrepRowstreamerOverrideQueryByColumn = flag.String("vreplication_rowstreamer_override_query_by_column", "", "Override the select criteria used by copy with the single column from the PK (where overrideColumn > lastPK[overrideColumn]). vreplication_rowstreamer_override_query_for_table must also be set. Empty means no override.")
+var vrepRowstreamerOverrideQueryForTable = flag.String("vreplication_rowstreamer_override_query_for_table", "", "Override the select criteria used by copy for the specific table. vreplication_rowstreamer_override_query_by_column must also be set. Empty means no override.")
 
 // RowStreamer exposes an externally usable interface to rowStreamer.
 type RowStreamer interface {
@@ -167,6 +170,18 @@ func buildPKColumns(st *binlogdatapb.MinimalTable) ([]int, error) {
 	return pkColumns, nil
 }
 
+func (rs *rowStreamer) overrideWhereByColumn() int {
+	if !strings.EqualFold(rs.plan.Table.Name, *vrepRowstreamerOverrideQueryForTable) {
+		return -1
+	}
+	for _, i := range rs.pkColumns {
+		if strings.EqualFold(rs.plan.Table.Fields[i].Name, *vrepRowstreamerOverrideQueryByColumn) {
+			return i
+		}
+	}
+	return -1
+}
+
 func (rs *rowStreamer) buildSelect() (string, error) {
 	buf := sqlparser.NewTrackedBuffer(nil)
 	// We could have used select *, but being explicit is more predictable.
@@ -186,28 +201,34 @@ func (rs *rowStreamer) buildSelect() (string, error) {
 			return "", fmt.Errorf("primary key values don't match length: %v vs %v", rs.lastpk, rs.pkColumns)
 		}
 		buf.WriteString(" where ")
-		prefix := ""
-		maxCrit := *vrepRowstreamerMaxCriteria - 1
-		if maxCrit < 0 {
-			maxCrit = len(rs.pkColumns) - 1
-		}
-		// This loop handles the case for composite pks. For example,
-		// if lastpk was (1,2), the where clause would be:
-		// (col1 = 1 and col2 > 2) or (col1 > 1).
-		// A tuple inequality like (col1,col2) > (1,2) ends up
-		// being a full table scan for mysql.
 
-		for lastcol := len(rs.pkColumns) - 1; lastcol >= 0 && maxCrit >= 0; lastcol, maxCrit = lastcol-1, maxCrit-1 {
-			buf.Myprintf("%s(", prefix)
-			prefix = " or "
-			for i, pk := range rs.pkColumns[:lastcol] {
-				buf.Myprintf("%v = ", sqlparser.NewColIdent(rs.plan.Table.Fields[pk].Name))
-				rs.lastpk[i].EncodeSQL(buf)
-				buf.Myprintf(" and ")
+		if overrideIndex := rs.overrideWhereByColumn(); overrideIndex >= 0 {
+			buf.Myprintf("%v > ", sqlparser.NewColIdent(*vrepRowstreamerOverrideQueryByColumn))
+			rs.lastpk[overrideIndex].EncodeSQL(buf)
+		} else {
+			prefix := ""
+			maxCrit := *vrepRowstreamerMaxCriteria - 1
+			if maxCrit < 0 {
+				maxCrit = len(rs.pkColumns) - 1
 			}
-			buf.Myprintf("%v > ", sqlparser.NewColIdent(rs.plan.Table.Fields[rs.pkColumns[lastcol]].Name))
-			rs.lastpk[lastcol].EncodeSQL(buf)
-			buf.Myprintf(")")
+			// This loop handles the case for composite pks. For example,
+			// if lastpk was (1,2), the where clause would be:
+			// (col1 = 1 and col2 > 2) or (col1 > 1).
+			// A tuple inequality like (col1,col2) > (1,2) ends up
+			// being a full table scan for mysql.
+
+			for lastcol := len(rs.pkColumns) - 1; lastcol >= 0 && maxCrit >= 0; lastcol, maxCrit = lastcol-1, maxCrit-1 {
+				buf.Myprintf("%s(", prefix)
+				prefix = " or "
+				for i, pk := range rs.pkColumns[:lastcol] {
+					buf.Myprintf("%v = ", sqlparser.NewColIdent(rs.plan.Table.Fields[pk].Name))
+					rs.lastpk[i].EncodeSQL(buf)
+					buf.Myprintf(" and ")
+				}
+				buf.Myprintf("%v > ", sqlparser.NewColIdent(rs.plan.Table.Fields[rs.pkColumns[lastcol]].Name))
+				rs.lastpk[lastcol].EncodeSQL(buf)
+				buf.Myprintf(")")
+			}
 		}
 	}
 	buf.Myprintf(" order by ", sqlparser.NewTableIdent(rs.plan.Table.Name))
