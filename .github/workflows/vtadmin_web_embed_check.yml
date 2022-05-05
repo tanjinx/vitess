@@ -1,0 +1,29 @@
+name: vtadmin-web embed check
+
+# In specifying the 'paths' property, we need to include the path to this workflow .yml file.
+# See https://github.community/t/trigger-a-workflow-on-change-to-the-yml-file-itself/17792/4)
+on:
+    push:
+        paths:
+            - '.github/workflows/vtadmin_web_build.yml'
+            - 'go/vt/vtadmin/web'
+            - 'web/vtadmin/**'
+    pull_request:
+        paths:
+            - '.github/workflows/vtadmin_web_build.yml'
+            - 'go/vt/vtadmin/web'
+            - 'web/vtadmin/**'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2
+              with:
+                  # node-version should match package.json
+                  node-version: '16.13.0'
+
+            - name: vtadmin_web_embed_check
+              run: tools/vtadmin_web_embed_check.sh
