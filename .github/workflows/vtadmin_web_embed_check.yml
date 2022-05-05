@@ -7,11 +7,13 @@ on:
         paths:
             - '.github/workflows/vtadmin_web_embed_check.yml'
             - 'go/vt/vtadmin/web/**'
+            - 'tools/vtadmin_web_embed_check.sh'
             - 'web/vtadmin/**'
     pull_request:
         paths:
             - '.github/workflows/vtadmin_web_embed_check.yml'
             - 'go/vt/vtadmin/web/**'
+            - 'tools/vtadmin_web_embed_check.sh'
             - 'web/vtadmin/**'
 
 jobs:
