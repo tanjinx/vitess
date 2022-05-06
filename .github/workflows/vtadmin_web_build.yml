@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build front-end
-        run: tools/vtadmin_web_embed_check.sh
+        run: tools/check_vtadmin_web_embed.sh
 
     # Cancel pending and in-progress runs of this workflow if a newer ref is pushed to CI.
     concurrency: 
