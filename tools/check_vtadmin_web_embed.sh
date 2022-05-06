@@ -47,4 +47,9 @@ if [[ $(git status --porcelain) != '' ]]; then
   exit 1
 fi
 
-echo 'clean'
+make vtadmin_web_embed
+
+if [[ $(git status --porcelain) != '' ]]; then
+  echo 'ERROR: Working directory is after build.'
+  exit 1
+fi
