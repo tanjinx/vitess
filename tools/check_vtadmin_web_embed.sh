@@ -42,8 +42,9 @@ set -ex
 #      css.map files is acceptable for this check.
 #
 
-if [[ $(git diff --stat) != '' ]]; then
-  echo 'dirty'
-else
-  echo 'clean'
+if [[ $(git status --porcelain) != '' ]]; then
+  echo 'ERROR: Working directory is dirty.'
+  exit 1
 fi
+
+echo 'clean'
