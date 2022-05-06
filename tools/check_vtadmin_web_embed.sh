@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
+
+set -ex
+
 # This script checks that the vtadmin front-end build committed to
 # (and embedded by) the 'go/vt/vtadmin/web/**' directory matches 
 # the build produced by running 'make vtadmin_web_embed' given 
@@ -32,4 +34,16 @@
 #
 #   2. It is fine to overwrite (but not commit) the current build files in 'go/vt/vtadmin/web/**'.
 # 
-#   3. 
+#   3. Certain file paths are okay to ignore _for the purposes of this check_.
+#      Some built files will produce a (functionally) meaningless diff every time
+#      `make vtadmin_web_embed` is run; for example, CSS/JS source maps will insert a random
+#      value on every build. Since a meaningful change in a css.map file would be accompanied
+#      by a corresponding change in the .css source file, ignoring changes to _just_ the
+#      css.map files is acceptable for this check.
+#
+
+if [[ $(git diff --stat) != '' ]]; then
+  echo 'dirty'
+else
+  echo 'clean'
+fi

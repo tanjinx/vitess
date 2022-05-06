@@ -6,10 +6,14 @@ on:
   push:
     paths:
       - '.github/workflows/vtadmin_web_build.yml'
+      - 'go/vt/vtadmin/web/**'
+      - 'tools/check_vtadmin_web_embed.sh'
       - 'web/vtadmin/**'
   pull_request:
     paths:
       - '.github/workflows/vtadmin_web_build.yml'
+      - 'go/vt/vtadmin/web/**'
+      - 'tools/check_vtadmin_web_embed.sh'
       - 'web/vtadmin/**'
 
 defaults:
@@ -31,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build front-end
-        run: npm run build
+        run: tools/vtadmin_web_embed_check.sh
 
     # Cancel pending and in-progress runs of this workflow if a newer ref is pushed to CI.
     concurrency: 
