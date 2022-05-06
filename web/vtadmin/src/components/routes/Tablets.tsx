@@ -108,7 +108,7 @@ export const Tablets = () => {
     return (
         <div>
             <WorkspaceHeader>
-                <WorkspaceTitle>Tablets?</WorkspaceTitle>
+                <WorkspaceTitle>Tablets</WorkspaceTitle>
             </WorkspaceHeader>
             <ContentContainer>
                 <DataFilter

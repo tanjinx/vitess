@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-set -ex
+set -e
 
 # This script checks that the vtadmin front-end build committed to
 # (and embedded by) the 'go/vt/vtadmin/web/**' directory matches 
