@@ -42,12 +42,12 @@ set -ex
 #      ignoring changes to _just_ the css.map files is acceptable for this check.
 #
 
-# if [[ $(git status --porcelain) != '' ]]; then
-#   echo 'ERROR: Working directory is dirty.'
-#   exit 1
-# fi
+if [[ $(git status --porcelain) != '' ]]; then
+  echo 'ERROR: Working directory is dirty.'
+  exit 1
+fi
 
-# make vtadmin_web_embed
+make vtadmin_web_embed
 
 output=$(git status --porcelain . -- ':!*.css.map' ':!*.js.map')
 
