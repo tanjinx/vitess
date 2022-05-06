@@ -36,13 +36,13 @@ set -ex
 # 
 #   3. Certain file paths are okay to ignore _for the purposes of this check_.
 #      Some built files will produce a (functionally) meaningless diff every time
-#      `make vtadmin_web_embed` is run; for example, CSS/JS source maps will insert a random
-#      value on every build. Since a meaningful change in a css.map file would be accompanied
-#      by a corresponding change in the .css source file, ignoring changes to _just_ the
-#      css.map files is acceptable for this check.
+#      `make vtadmin_web_embed` is run; for example, CSS/JS source maps are quiet environment
+#      dependent and are expected to change on every build. Since a meaningful change
+#      in a css.map file would be accompanied by a corresponding change in the .css source file, 
+#      ignoring changes to _just_ the css.map files is acceptable for this check.
 #
 
-ignores=":!*.css.map"
+ignores=":!*.css.map :!*.js.map"
 
 if [[ $(git status --porcelain) != '' ]]; then
   echo 'ERROR: Working directory is dirty.'
