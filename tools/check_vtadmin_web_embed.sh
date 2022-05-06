@@ -42,21 +42,20 @@ set -ex
 #      ignoring changes to _just_ the css.map files is acceptable for this check.
 #
 
-ignores=":!*.css.map :!*.js.map"
+# if [[ $(git status --porcelain) != '' ]]; then
+#   echo 'ERROR: Working directory is dirty.'
+#   exit 1
+# fi
 
-if [[ $(git status --porcelain) != '' ]]; then
-  echo 'ERROR: Working directory is dirty.'
-  exit 1
-fi
+# make vtadmin_web_embed
 
-make vtadmin_web_embed
+output=$(git status --porcelain . -- ':!*.css.map' ':!*.js.map')
 
-if [[ $(git status --porcelain -- "$ignores") != '' ]]; then
-  echo 'ERROR: Working directory is after build.'
-
-  git diff 
-
-  exit 1
+if [[ $output != '' ]]; then
+    echo 'ERROR: Working directory is dirty after build.'
+    echo "$output"
+    git diff
+    exit 1
 fi
 
 echo "ok!"
