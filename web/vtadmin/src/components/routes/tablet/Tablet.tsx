@@ -32,6 +32,7 @@ import { TabContainer } from '../../tabs/TabContainer';
 import Advanced from './Advanced';
 import style from './Tablet.module.scss';
 import { TabletCharts } from './TabletCharts';
+import { TabletOverview } from './TabletOverview';
 
 interface RouteParams {
     alias: string;
@@ -102,6 +103,7 @@ export const Tablet = () => {
 
             <ContentContainer>
                 <TabContainer>
+                    <Tab text="Overview" to={`${url}/overview`} />
                     <Tab text="QPS" to={`${url}/qps`} />
                     <Tab text="JSON" to={`${url}/json`} />
 
@@ -111,6 +113,10 @@ export const Tablet = () => {
                 </TabContainer>
 
                 <Switch>
+                    <Route path={`${path}/overview`}>
+                        <TabletOverview tablet={tablet} />
+                    </Route>
+
                     <Route path={`${path}/qps`}>
                         <TabletCharts alias={alias} clusterID={clusterID} />
                     </Route>
@@ -131,7 +137,7 @@ export const Tablet = () => {
                         </Route>
                     )}
 
-                    <Redirect to={`${path}/qps`} />
+                    <Redirect to={`${path}/overview`} />
                 </Switch>
             </ContentContainer>
 
