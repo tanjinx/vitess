@@ -190,6 +190,11 @@ func (vc *vcopier) catchup(ctx context.Context, copyState map[string]*sqltypes.R
 	}
 }
 
+func cc(cancelFunc context.CancelFunc) {
+	log.Infof("Cancel!")
+	cancelFunc()
+}
+
 // copyTable performs the synchronized copy of the next set of rows from
 // the current table being copied. Each packet received is transactionally
 // committed with the lastpk. This allows for consistent resumability.
@@ -211,7 +216,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, *copyPhaseDuration)
-	defer cancel()
+	defer cc(cancel)
 
 	var lastpkpb *querypb.QueryResult
 	if lastpkqr := copyState[tableName]; lastpkqr != nil {
@@ -243,6 +248,9 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			}
 		}
 		shouldDrop = rows.Done
+
+		log.Infof("table plan is %v", vc.tablePlan)
+
 		if vc.tablePlan == nil {
 			if len(rows.Fields) == 0 {
 				return fmt.Errorf("expecting field event first, got: %v", rows)
@@ -263,7 +271,10 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			buf.Myprintf("update _vt.copy_state set lastpk=%a where vrepl_id=%s and table_name=%s", ":lastpk", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
 			updateCopyState = buf.ParsedQuery()
 		}
+
+		log.Infof("update query: %s", updateCopyState.Query)
 		log.Infof("rows to copy: %d, gtid: %s", len(rows.Rows), rows.Gtid)
+
 		if len(rows.Rows) == 0 {
 			return nil
 		}
