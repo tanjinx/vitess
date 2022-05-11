@@ -246,9 +246,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 				break
 			}
 		}
-
-		log.Infof("table plan is %v", vc.tablePlan)
-
+		
 		if vc.tablePlan == nil {
 			if len(rows.Fields) == 0 {
 				return fmt.Errorf("expecting field event first, got: %v", rows)
@@ -270,7 +268,6 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			updateCopyState = buf.ParsedQuery()
 		}
 
-		log.Infof("update query: %s", updateCopyState.Query)
 		log.Infof("rows to copy: %d, gtid: %s", len(rows.Rows), rows.Gtid)
 
 		if len(rows.Rows) == 0 {
@@ -335,6 +332,7 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 	default:
 	}
 	if err != nil {
+		log.Errorf("Exiting copy with an error %v", err)
 		return err
 	}
 	log.Infof("Copy of %v finished at lastpk: %v", tableName, bv)
