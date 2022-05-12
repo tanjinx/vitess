@@ -58,6 +58,7 @@ import {
     ValidateVersionKeyspaceParams,
     validateVersionKeyspace,
     fetchShardReplicationPositions,
+    deleteShards,
 } from '../api/http';
 import { vtadmin as pb } from '../proto/vtadmin';
 import { formatAlias } from '../util/tablets';
@@ -197,6 +198,19 @@ export const useShardReplicationPositions = (
     params: Parameters<typeof fetchShardReplicationPositions>[0],
     options?: UseQueryOptions<pb.GetShardReplicationPositionsResponse, Error> | undefined
 ) => useQuery(['shard_replication_positions', params], () => fetchShardReplicationPositions(params), options);
+
+/**
+ *
+ * useDeleteShards is a mutate hook that deletes one or more shards in a keyspace.
+ */
+export const useDeleteShards = (
+    params: Parameters<typeof deleteShards>[0],
+    options: UseMutationOptions<Awaited<ReturnType<typeof deleteShards>>, Error>
+) => {
+    return useMutation<Awaited<ReturnType<typeof deleteShards>>, Error>(() => {
+        return deleteShards(params);
+    }, options);
+};
 
 /**
  * useStartReplication starts replication on the specified tablet.

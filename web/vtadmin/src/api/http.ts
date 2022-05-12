@@ -492,3 +492,20 @@ export const fetchShardReplicationPositions = async ({
 
     return pb.GetShardReplicationPositionsResponse.create(result);
 };
+
+export interface DeleteShardsParams {
+    clusterID: string;
+    keyspaceShards: (string | null | undefined)[];
+}
+
+export const deleteShards = async ({ clusterID, keyspaceShards = [] }: DeleteShardsParams) => {
+    const req = new URLSearchParams();
+    keyspaceShards.forEach((s) => s && req.append('keyspace_shard', s));
+
+    const { result } = await vtfetch(`/api/shards/${clusterID}?${req}`, { method: 'delete' });
+
+    const err = vtctldata.DeleteShardsResponse.verify(result);
+    if (err) throw Error(err);
+
+    return vtctldata.DeleteShardsResponse.create(result);
+};
