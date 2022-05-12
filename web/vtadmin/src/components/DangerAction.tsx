@@ -26,9 +26,9 @@ type Mutation = UseMutationResult & {
 interface DangerActionProps {
     title: string;
     action: string;
-    description: JSX.Element;
+    description: React.ReactNode;
     primary: boolean;
-    primaryDescription: JSX.Element;
+    primaryDescription: React.ReactNode;
     alias: string;
     mutation: UseMutationResult;
     loadingText: string;

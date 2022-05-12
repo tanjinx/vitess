@@ -16,6 +16,24 @@
 import { groupBy } from 'lodash-es';
 import { vtadmin as pb, vtctldata } from '../proto/vtadmin';
 
+export const formatKeyspaceShard = (
+    keyspace: string | null | undefined,
+    shard: string | null | undefined
+): string | null => {
+    return keyspace && shard ? `${keyspace}/${shard}` : null;
+};
+
+export const findShard = <K extends pb.IKeyspace>(
+    keyspace: K | null | undefined,
+    shardName: string
+): vtctldata.IShard | null => {
+    if (keyspace?.shards && shardName in keyspace.shards) {
+        return keyspace.shards[shardName];
+    }
+
+    return null;
+};
+
 export enum ShardState {
     serving = 'serving',
     nonserving = 'nonserving',

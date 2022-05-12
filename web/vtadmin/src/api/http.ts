@@ -496,11 +496,26 @@ export const fetchShardReplicationPositions = async ({
 export interface DeleteShardsParams {
     clusterID: string;
     keyspaceShards: (string | null | undefined)[];
+    evenIfServing?: boolean;
+    recursive?: boolean;
 }
 
-export const deleteShards = async ({ clusterID, keyspaceShards = [] }: DeleteShardsParams) => {
+export const deleteShards = async ({
+    clusterID,
+    evenIfServing,
+    keyspaceShards = [],
+    recursive,
+}: DeleteShardsParams) => {
     const req = new URLSearchParams();
     keyspaceShards.forEach((s) => s && req.append('keyspace_shard', s));
+
+    if (typeof evenIfServing !== 'undefined') {
+        req.append('even_if_serving', evenIfServing.toString());
+    }
+
+    if (typeof recursive !== 'undefined') {
+        req.append('recursive', recursive.toString());
+    }
 
     const { result } = await vtfetch(`/api/shards/${clusterID}?${req}`, { method: 'delete' });
 

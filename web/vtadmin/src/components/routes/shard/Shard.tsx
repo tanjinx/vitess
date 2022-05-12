@@ -29,6 +29,7 @@ import { useDocumentTitle } from '../../../hooks/useDocumentTitle';
 import { KeyspaceLink } from '../../links/KeyspaceLink';
 import { useKeyspace } from '../../../hooks/api';
 import { ShardTablets } from './ShardTablets';
+import { Advanced } from './Advanced';
 
 interface RouteParams {
     clusterID: string;
@@ -113,6 +114,7 @@ export const Shard = () => {
                 <TabContainer>
                     <Tab text="Tablets" to={`${url}/tablets`} />
                     <Tab text="JSON" to={`${url}/json`} />
+                    <Tab text="Advanced" to={`${url}/advanced`} />
                 </TabContainer>
 
                 <Switch>
@@ -121,6 +123,10 @@ export const Shard = () => {
                     </Route>
 
                     <Route path={`${path}/json`}>{shard && <Code code={JSON.stringify(shard, null, 2)} />}</Route>
+
+                    <Route path={`${path}/advanced`}>
+                        <Advanced {...params} />
+                    </Route>
 
                     <Redirect from={path} to={`${path}/tablets`} />
                 </Switch>
