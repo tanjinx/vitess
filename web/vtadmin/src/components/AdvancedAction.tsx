@@ -54,6 +54,12 @@ export const AdvancedAction: React.FC<Props> = ({
         isDisabled = isDisabled || typedConfirmation !== confirmationText;
     }
 
+    const onClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+        e.preventDefault();
+        (mutation as any).mutate();
+        setTypedConfirmation('');
+    };
+
     return (
         <div
             className={`p-9 pb-12 last:border-b border border-gray-400 border-b-0 first:rounded-t-lg last:rounded-b-lg ${
@@ -101,7 +107,7 @@ export const AdvancedAction: React.FC<Props> = ({
             )}
 
             <button
-                onClick={mutation.mutate}
+                onClick={onClick}
                 className={`btn btn-secondary mt-4 ${danger && 'btn-danger'}`}
                 disabled={isDisabled}
             >
