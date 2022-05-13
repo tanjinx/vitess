@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
+import { useState } from 'react';
 import { UseMutationResult } from 'react-query';
 import { Icon, Icons } from './Icon';
+import { TextInput } from './TextInput';
 
 interface Props {
+    // TODO button text props (loading etc.)
+
+    confirmationPlaceholder?: string;
+    confirmationPrompt?: React.ReactNode;
+    confirmationText?: string;
+
+    danger?: boolean;
     description?: React.ReactNode;
     disabled?: boolean;
     documentationHref?: string;
@@ -27,6 +36,10 @@ interface Props {
 }
 
 export const AdvancedAction: React.FC<Props> = ({
+    confirmationPlaceholder,
+    confirmationPrompt,
+    confirmationText,
+    danger,
     description,
     disabled,
     documentationHref,
@@ -34,8 +47,19 @@ export const AdvancedAction: React.FC<Props> = ({
     title,
     warnings = [],
 }) => {
+    const [typedConfirmation, setTypedConfirmation] = useState('');
+
+    let isDisabled = disabled || mutation.isLoading;
+    if (confirmationText) {
+        isDisabled = isDisabled || typedConfirmation !== confirmationText;
+    }
+
     return (
-        <div className="p-9 pb-12 last:border-b border border-gray-400 border-b-0 first:rounded-t-lg last:rounded-b-lg">
+        <div
+            className={`p-9 pb-12 last:border-b border border-gray-400 border-b-0 first:rounded-t-lg last:rounded-b-lg ${
+                danger && 'border-danger'
+            }`}
+        >
             <div className="flex justify-between items-start mb-2">
                 <div className="font-bold m-0 text-gray-900">{title}</div>
 
@@ -63,10 +87,23 @@ export const AdvancedAction: React.FC<Props> = ({
                 </ul>
             )}
 
+            {confirmationText && (
+                <div>
+                    <p className="text-base">{confirmationPrompt}</p>
+                    <div className="w-1/3">
+                        <TextInput
+                            placeholder={confirmationPlaceholder}
+                            value={typedConfirmation}
+                            onChange={(e) => setTypedConfirmation(e.target.value)}
+                        />
+                    </div>
+                </div>
+            )}
+
             <button
                 onClick={mutation.mutate}
-                className="btn btn-secondary mt-4"
-                disabled={disabled || mutation.isLoading}
+                className={`btn btn-secondary mt-4 ${danger && 'btn-danger'}`}
+                disabled={isDisabled}
             >
                 {title}
             </button>

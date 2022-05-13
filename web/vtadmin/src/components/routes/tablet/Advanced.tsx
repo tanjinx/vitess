@@ -15,7 +15,6 @@
  */
 
 import React from 'react';
-import { UseMutationResult } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import {
     useDeleteTablet,
@@ -28,8 +27,6 @@ import {
 import { vtadmin } from '../../../proto/vtadmin';
 import { isPrimary } from '../../../util/tablets';
 import { AdvancedAction } from '../../AdvancedAction';
-import DangerAction from '../../DangerAction';
-import { Icon, Icons } from '../../Icon';
 import { success, warn } from '../../Snackbar';
 
 interface AdvancedProps {
@@ -163,76 +160,74 @@ const Advanced: React.FC<AdvancedProps> = ({ tablet }) => {
 
             <div className="my-8">
                 <h3 className="mb-4">Danger</h3>
-                <div className="border border-danger rounded-lg">
-                    {primary && (
-                        <div>
-                            <div className="border-red-400 border-b w-full" />
-                            <DangerAction
-                                title="Set Read-Only"
-                                documentationLink="https://vitess.io/docs/reference/programs/vtctl/tablets/#setreadonly"
-                                primaryDescription={
-                                    <div>
-                                        This will disable writing on the primary tablet {alias}. Use with caution.
-                                    </div>
-                                }
-                                description={
-                                    <div>
-                                        Set tablet <span className="font-bold">{alias}</span> to read-only.
-                                    </div>
-                                }
-                                action="set tablet to read-only"
-                                mutation={setReadOnlyMutation as UseMutationResult}
-                                loadingText="Setting..."
-                                loadedText="Set to read-only"
-                                primary={primary}
-                                alias={alias}
-                            />
-                            <div className="border-red-400 border-b w-full" />
-                            <DangerAction
-                                title="Set Read-Write"
-                                documentationLink="https://vitess.io/docs/reference/programs/vtctl/tablets/#setreadwrite"
-                                primaryDescription={
-                                    <div>
-                                        This will re-enable writing on the primary tablet {alias}. Use with caution.
-                                    </div>
-                                }
-                                description={
-                                    <div>
-                                        Set tablet <span className="font-bold">{alias}</span> to read-write.
-                                    </div>
-                                }
-                                action="set tablet to read-only"
-                                mutation={setReadWriteMutation as UseMutationResult}
-                                loadingText="Setting..."
-                                loadedText="Set to read-write"
-                                primary={primary}
-                                alias={alias}
-                            />
-                            <div className="border-red-400 border-b w-full" />
-                        </div>
+                <div>
+                    {!primary && (
+                        <AdvancedAction
+                            confirmationPlaceholder="zone-xxx"
+                            confirmationPrompt="Please type the tablet's alias to set tablet to read-only:"
+                            confirmationText={alias}
+                            danger
+                            description={
+                                <>
+                                    Set tablet <span className="font-bold">{alias}</span> to read-only.
+                                </>
+                            }
+                            documentationHref="https://vitess.io/docs/reference/programs/vtctl/tablets/#setreadonly"
+                            mutation={setReadOnlyMutation}
+                            title="Set Read-Only"
+                            warnings={[
+                                primary && (
+                                    <>This will disable writing on the primary tablet {alias}. Use with caution.</>
+                                ),
+                            ]}
+                        />
                     )}
-                    <DangerAction
-                        title="Delete Tablet"
-                        documentationLink="https://vitess.io/docs/reference/programs/vtctl/tablets/#deletetablet"
-                        primaryDescription={
-                            <div>
-                                Tablet {alias} is the primary tablet. Flag{' '}
-                                <span className="font-mono bg-red-100 p-1 text-sm">-allow_master=true</span> will be
-                                applied in order to delete the primary tablet.
-                            </div>
-                        }
+
+                    {!primary && (
+                        <AdvancedAction
+                            confirmationPlaceholder="zone-xxx"
+                            confirmationPrompt="Please type the tablet's alias to set tablet to read-only"
+                            confirmationText={alias}
+                            danger
+                            description={
+                                <>
+                                    Set tablet <span className="font-bold">{alias}</span> to read-write.
+                                </>
+                            }
+                            documentationHref="https://vitess.io/docs/reference/programs/vtctl/tablets/#setreadwrite"
+                            mutation={setReadWriteMutation}
+                            title="Set Read-Write"
+                            warnings={[
+                                primary && (
+                                    <>This will re-enable writing on the primary tablet {alias}. Use with caution.</>
+                                ),
+                            ]}
+                        />
+                    )}
+
+                    <AdvancedAction
+                        confirmationPlaceholder="zone-xxx"
+                        confirmationPrompt="Please type the tablet's alias to delete the tablet:"
+                        confirmationText={alias}
+                        danger
                         description={
-                            <div>
+                            <>
                                 Delete tablet <span className="font-bold">{alias}</span>. Doing so will remove it from
                                 the topology, but vttablet and MySQL won't be touched.
-                            </div>
+                            </>
                         }
-                        action="delete the tablet"
-                        mutation={deleteTabletMutation as UseMutationResult}
-                        loadingText="Deleting..."
-                        loadedText="Delete"
-                        primary={primary}
-                        alias={alias}
+                        documentationHref="https://vitess.io/docs/reference/programs/vtctl/tablets/#deletetablet"
+                        mutation={deleteTabletMutation}
+                        title="Delete Tablet"
+                        warnings={[
+                            primary && (
+                                <>
+                                    Tablet {alias} is the primary tablet. Flag{' '}
+                                    <span className="font-mono bg-red-100 p-1 text-sm">-allow_master=true</span> will be
+                                    applied in order to delete the primary tablet.
+                                </>
+                            ),
+                        ]}
                     />
                 </div>
             </div>
