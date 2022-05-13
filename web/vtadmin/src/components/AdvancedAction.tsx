@@ -98,6 +98,7 @@ export const AdvancedAction: React.FC<Props> = ({
                     <p className="text-base">{confirmationPrompt}</p>
                     <div className="w-1/3">
                         <TextInput
+                            aria-label="confirm"
                             placeholder={confirmationPlaceholder}
                             value={typedConfirmation}
                             onChange={(e) => setTypedConfirmation(e.target.value)}
