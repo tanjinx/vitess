@@ -235,12 +235,20 @@ export const fetchTablet = async ({ clusterID, alias }: FetchTabletParams) => {
 };
 
 export interface DeleteTabletParams {
+    allowPrimary?: boolean;
     clusterID: string;
     alias: string;
 }
 
-export const deleteTablet = async ({ clusterID, alias }: DeleteTabletParams) => {
-    const { result } = await vtfetch(`/api/tablet/${alias}?cluster=${clusterID}`, { method: 'delete' });
+export const deleteTablet = async ({ clusterID, alias, allowPrimary }: DeleteTabletParams) => {
+    const req = new URLSearchParams();
+    req.append('cluster', clusterID);
+
+    if (typeof allowPrimary !== 'undefined') {
+        req.append('allow_primary', allowPrimary.toString())
+    }
+
+    const { result } = await vtfetch(`/api/tablet/${alias}?${req}`, { method: 'delete' });
 
     const err = pb.DeleteTabletResponse.verify(result);
     if (err) throw Error(err);

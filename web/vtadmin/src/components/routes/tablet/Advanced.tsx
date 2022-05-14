@@ -17,6 +17,7 @@
 import React from 'react';
 import { UseMutationResult } from 'react-query';
 import { useHistory } from 'react-router-dom';
+import { DeleteTabletParams } from '../../../api/http';
 import {
     useDeleteTablet,
     useReparentTablet,
@@ -25,8 +26,8 @@ import {
     useStartReplication,
     useStopReplication,
 } from '../../../hooks/api';
-import { vtadmin } from '../../../proto/vtadmin';
-import { formatAlias, isPrimary } from '../../../util/tablets';
+import { topodata, vtadmin } from '../../../proto/vtadmin';
+import { formatAlias, isPrimary, TABLET_TYPES } from '../../../util/tablets';
 import DangerAction from '../../DangerAction';
 import { Icon, Icons } from '../../Icon';
 import { success, warn } from '../../Snackbar';
@@ -43,8 +44,12 @@ const Advanced: React.FC<AdvancedProps> = ({ tablet }) => {
     const history = useHistory();
     const primary = isPrimary(tablet);
 
-    const deleteTabletMutation = useDeleteTablet(
-        { alias, clusterID },
+    const deleteParams: DeleteTabletParams = { alias, clusterID };
+    if (tablet?.tablet?.type === topodata.TabletType.PRIMARY) {
+        deleteParams.allowPrimary = true;
+    }
+
+    const deleteTabletMutation = useDeleteTablet(deleteParams,
         {
             onSuccess: () => {
                 success(`Successfully deleted tablet ${alias}`);

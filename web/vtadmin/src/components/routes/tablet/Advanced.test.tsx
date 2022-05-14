@@ -275,7 +275,7 @@ describe('Advanced', () => {
         });
     });
 
-    describe('Delete', () => {
+    describe.only('Delete', () => {
         it('deletes the tablet', async () => {
             const tablet = makeTablet();
             renderHelper(<Advanced tablet={tablet} />);
@@ -300,8 +300,28 @@ describe('Advanced', () => {
             });
         });
 
-        it('deletes the tablet with allow_master=true if primary', () => {
-            // TODO
+        it('deletes the tablet with allow_master=true if primary', async () => {
+            const tablet = makePrimaryTablet();
+            renderHelper(<Advanced tablet={tablet} />);
+
+            const container = screen.getByTestId('delete-tablet');
+            const button = within(container).getByRole('button');
+            const input = within(container).getByRole('textbox');
+
+            expect(button).toHaveAttribute('disabled');
+
+            fireEvent.change(input, { target: { value: 'zone1-101' } });
+            expect(button).not.toHaveAttribute('disabled');
+
+            fireEvent.click(button);
+
+            await waitFor(() => {
+                expect(global.fetch).toHaveBeenCalledTimes(1);
+                expect(global.fetch).toHaveBeenCalledWith('/api/tablet/zone1-101?cluster=some-cluster-id&allow_primary=true', {
+                    credentials: undefined,
+                    method: 'delete',
+                });
+            });
         });
     });
 });
