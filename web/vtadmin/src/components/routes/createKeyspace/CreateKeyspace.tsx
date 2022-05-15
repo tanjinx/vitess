@@ -26,7 +26,8 @@ import { NavCrumbs } from '../../layout/NavCrumbs';
 import { WorkspaceHeader } from '../../layout/WorkspaceHeader';
 import { WorkspaceTitle } from '../../layout/WorkspaceTitle';
 import { TextInput } from '../../TextInput';
-import { success, warn } from '../../Snackbar';
+import { success } from '../../Snackbar';
+import { Icon, Icons } from '../../Icon';
 
 interface FormData {
     clusterID: string;
@@ -129,8 +130,11 @@ export const CreateKeyspace = () => {
                     </details>
 
                     {mutation.isError && !mutation.isLoading && (
-                        <div className="border border-red-400 bg-red-50 p-4 rounded-md" role="alert">
-                            <div className="text-md font-bold mb-4">Couldn't create keyspace.</div>
+                        <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
+                            <div className="text-md font-bold mb-4">
+                                <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} />{' '}
+                                Couldn't create keyspace.
+                            </div>
                             <div className="font-mono">{mutation.error?.message}</div>
                         </div>
                     )}
