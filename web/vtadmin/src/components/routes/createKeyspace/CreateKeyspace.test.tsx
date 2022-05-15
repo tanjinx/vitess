@@ -31,7 +31,7 @@ const TEST_PROCESS_ENV = {
     REACT_APP_VTADMIN_API_ADDRESS: '',
 };
 
-describe('CreateKeyspace', () => {
+describe('CreateKeyspace integration test', () => {
     const server = setupServer();
 
     beforeAll(() => {
@@ -54,7 +54,9 @@ describe('CreateKeyspace', () => {
         const cluster = { id: 'local', name: 'local' };
 
         server.use(
-            rest.get('/api/clusters', (req, res, ctx) => res(ctx.json({ result: { clusters: [cluster] }, ok: true }))),
+            rest.get('/api/clusters', (req, res, ctx) => {
+                return res(ctx.json({ result: { clusters: [cluster] }, ok: true }));
+            }),
             rest.post('/api/keyspace/:clusterID', (req, res, ctx) => {
                 const data: vtadmin.ICreateKeyspaceResponse = {
                     keyspace: {
@@ -67,8 +69,6 @@ describe('CreateKeyspace', () => {
         );
         server.listen();
 
-        const user = userEvent.setup();
-
         const history = createMemoryHistory();
         jest.spyOn(history, 'push');
 
@@ -76,6 +76,7 @@ describe('CreateKeyspace', () => {
             defaultOptions: { queries: { retry: false } },
         });
 
+        // Finally, render the view
         render(
             <Router history={history}>
                 <QueryClientProvider client={queryClient}>
@@ -84,38 +85,56 @@ describe('CreateKeyspace', () => {
             </Router>
         );
 
-        // Wait for initial queries to load
+        // Wait for initial queries to load. Given that the "initial queries" for this
+        // page are presently only the call to GET /api/clusters, checking that the
+        // Select is populated with the clusters from the response defined above is
+        // sufficient, albeit clumsy. This will need to be reworked in a future where
+        // we add more queries that fire on form load (e.g., to fetch all keyspaces.)
         await waitFor(() => {
-            expect(screen.queryByText('No items')).toBeNull();
+            expect(screen.queryByTestId('select-empty')).toBeNull();
         });
 
-        await user.click(screen.getByText('local (local)'));
-        await user.type(screen.getByLabelText('Keyspace Name'), 'some-keyspace');
-
+        // Reset the fetch mock after the initial queries have completed so that
+        // form submission assertions are easier.
         (global.fetch as any).mockClear();
 
+        // From here on we can proceed with filling out the form fields.
+        const user = userEvent.setup();
+        await user.click(screen.getByText('local (local)'));
+        await user.type(screen.getByLabelText('Keyspace Name'), 'some-keyspace');
+        await user.type(screen.getByLabelText('Sharding Column Name'), 'some-column-name');
+
+        // Submit the form
         const submitButton = screen.getByText('Create Keyspace', {
             selector: 'button[type="submit"]',
         });
         await user.click(submitButton);
 
+        // Assert that the client sent the correct API request
         expect(global.fetch).toHaveBeenCalledTimes(1);
         expect(global.fetch).toHaveBeenCalledWith('/api/keyspace/local', {
             credentials: undefined,
-            // TODO omit empty fields
-            body: JSON.stringify({ name: 'some-keyspace', sharding_column_name: '' }),
+            body: JSON.stringify({
+                name: 'some-keyspace',
+                sharding_column_name: 'some-column-name',
+            }),
             method: 'post',
         });
 
+        // Validate form UI loading state, while the API request is "in flight"
         expect(submitButton).toHaveTextContent('Creating Keyspace...');
+        expect(submitButton).toHaveAttribute('disabled');
 
+        // Wait for the API request to complete
         await waitFor(() => {
             expect(submitButton).toHaveTextContent('Create Keyspace');
         });
 
+        // Validate redirect to the new keyspace's detail page
         expect(history.push).toHaveBeenCalledTimes(1);
         expect(history.push).toHaveBeenCalledWith('/keyspace/local/some-keyspace');
 
+        // Validate that snackbar was triggered
         expect(Snackbar.success).toHaveBeenCalledTimes(1);
         expect(Snackbar.success).toHaveBeenCalledWith('Created keyspace some-keyspace', { autoClose: 1600 });
     });

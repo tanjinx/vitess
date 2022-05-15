@@ -116,14 +116,13 @@ export const CreateKeyspace = () => {
 
                     <details>
                         <summary className="font-semibold cursor-pointer">Advanced options</summary>
-                        <Label className="block my-8" label="Sharding Column Name (Optional)">
+                        <Label className="block my-8" label="Sharding Column Name">
                             <TextInput
                                 onChange={(e) => setFormData({ ...formData, shardingColumnName: e.target.value })}
                                 value={formData.shardingColumnName || ''}
                             />
-
-                            <span className="text-sm">The name of the column to use for sharding operations.</span>
                         </Label>
+                        <span className="text-sm">The name of the column to use for sharding operations.</span>
                     </details>
 
                     {mutation.isError && !mutation.isLoading && (

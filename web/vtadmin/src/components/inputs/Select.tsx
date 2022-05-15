@@ -126,7 +126,7 @@ export const Select = <T,>({
             emptyContent = <div className={style.emptyPlaceholder}>{emptyContent || 'No items'}</div>;
         }
         content = (
-            <div className={style.emptyContainer} {...getMenuProps()}>
+            <div className={style.emptyContainer} {...getMenuProps()} data-testid="select-empty">
                 {emptyContent}
             </div>
         );
