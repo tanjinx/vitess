@@ -33,7 +33,6 @@ import KeyspaceActions from './keyspaces/KeyspaceActions';
 import { ReadOnlyGate } from '../ReadOnlyGate';
 import { isReadOnlyMode } from '../../util/env';
 import { Link } from 'react-router-dom';
-import { Icon, Icons } from '../Icon';
 
 export const Keyspaces = () => {
     useDocumentTitle('Keyspaces');
