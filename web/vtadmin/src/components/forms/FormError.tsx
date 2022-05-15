@@ -17,7 +17,7 @@
 import { Icon, Icons } from '../Icon';
 
 interface Props {
-    title: string | null | undefined;
+    title: string;
     error: Error | null | undefined;
 }
 
