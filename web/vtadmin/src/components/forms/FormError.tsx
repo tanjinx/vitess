@@ -23,9 +23,9 @@ interface Props {
 
 export const FormError: React.FC<Props> = ({ error, title }) => {
     return (
-        <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
+        <div className="bg-red-50 p-8 rounded-md my-12" role="alert">
             <div className="text-md font-bold mb-4">
-                <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} /> {title}
+                <Icon className="inline fill-red-700 h-[20px] align-text-top" icon={Icons.alertFail} /> {title}
             </div>
             <div className="font-mono">{error?.message}</div>
         </div>
