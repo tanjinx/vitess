@@ -63,6 +63,8 @@ export const CreateKeyspace = () => {
         },
         {
             onSuccess: (res) => {
+                console.log('success');
+
                 queryClient.invalidateQueries('keyspaces');
                 success(`Created keyspace ${res?.keyspace?.keyspace?.name}`, { autoClose: 1600 });
                 history.push(`/keyspace/${res?.keyspace?.cluster?.id}/${res?.keyspace?.keyspace?.name}`);
@@ -83,6 +85,7 @@ export const CreateKeyspace = () => {
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
+        console.log('mutating', formData);
         mutation.mutate();
     };
 
