@@ -50,9 +50,8 @@ export const CreateKeyspace = () => {
     const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
 
     // TODO handle failure to load clusters
-    const { data: clusters = [] } = useClusters();
+    const { data: clusters = [], ...clustersQuery } = useClusters();
 
-    // TODO prevent mutation from firing unless valid
     const mutation = useCreateKeyspace(
         {
             clusterID: formData.clusterID,
@@ -97,15 +96,26 @@ export const CreateKeyspace = () => {
                 <form onSubmit={onSubmit}>
                     <Select
                         className="block w-full"
+                        disabled={clustersQuery.isLoading}
                         inputClassName="block w-full"
                         itemToString={(cluster) => cluster?.name || ''}
                         items={clusters}
                         label="Cluster"
                         onChange={(c) => setFormData({ ...formData, clusterID: c?.id || '' })}
-                        placeholder="Select a cluster"
+                        placeholder={clustersQuery.isLoading ? 'Loading clusters...' : 'Select a cluster'}
                         renderItem={(c) => `${c?.name} (${c?.id})`}
                         selectedItem={selectedCluster}
                     />
+
+                    {clustersQuery.isError && (
+                        <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
+                            <div className="text-md font-bold mb-4">
+                                <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} />{' '}
+                                Couldn't load clusters. Please try again.
+                            </div>
+                            <div className="font-mono">{clustersQuery.error?.message}</div>
+                        </div>
+                    )}
 
                     <Label className="block my-8" label="Keyspace Name">
                         <TextInput
@@ -129,7 +139,7 @@ export const CreateKeyspace = () => {
                         <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
                             <div className="text-md font-bold mb-4">
                                 <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} />{' '}
-                                Couldn't create keyspace.
+                                Couldn't create keyspace. Please reload the page to try again.
                             </div>
                             <div className="font-mono">{mutation.error?.message}</div>
                         </div>
