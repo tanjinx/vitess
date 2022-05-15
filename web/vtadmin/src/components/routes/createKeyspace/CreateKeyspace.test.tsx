@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 The Vitess Authors.
+ * Copyright 2022 The Vitess Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import { Router } from 'react-router-dom';
 import { CreateKeyspace } from './CreateKeyspace';
 import { vtadmin } from '../../../proto/vtadmin';
 import * as Snackbar from '../../Snackbar';
-import { MemoryHistory } from 'history';
 
 const ORIGINAL_PROCESS_ENV = process.env;
 const TEST_PROCESS_ENV = {
@@ -32,21 +31,20 @@ const TEST_PROCESS_ENV = {
     REACT_APP_VTADMIN_API_ADDRESS: '',
 };
 
-const server = setupServer();
-
 describe('CreateKeyspace', () => {
+    const server = setupServer();
+
     beforeAll(() => {
         process.env = { ...TEST_PROCESS_ENV } as NodeJS.ProcessEnv;
-        server.listen();
     });
 
     afterEach(() => {
         process.env = { ...TEST_PROCESS_ENV } as NodeJS.ProcessEnv;
-        server.resetHandlers();
     });
 
     afterAll(() => {
         process.env = { ...ORIGINAL_PROCESS_ENV };
+        server.close();
     });
 
     it('successfully creates a keyspace', async () => {
@@ -55,7 +53,7 @@ describe('CreateKeyspace', () => {
 
         const cluster = { id: 'local', name: 'local' };
 
-        const handlers = [
+        server.use(
             rest.get('/api/clusters', (req, res, ctx) => res(ctx.json({ result: { clusters: [cluster] }, ok: true }))),
             rest.post('/api/keyspace/:clusterID', (req, res, ctx) => {
                 const data: vtadmin.ICreateKeyspaceResponse = {
@@ -65,15 +63,31 @@ describe('CreateKeyspace', () => {
                     },
                 };
                 return res(ctx.json({ result: data, ok: true }));
-            }),
-        ];
-        server.use(...handlers);
+            })
+        );
+        server.listen();
 
         const user = userEvent.setup();
 
-        const { history } = renderHelper();
+        const history = createMemoryHistory();
+        jest.spyOn(history, 'push');
 
-        await waitForFormReady();
+        const queryClient = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+        });
+
+        render(
+            <Router history={history}>
+                <QueryClientProvider client={queryClient}>
+                    <CreateKeyspace />
+                </QueryClientProvider>
+            </Router>
+        );
+
+        // Wait for initial queries to load
+        await waitFor(() => {
+            expect(screen.queryByText('No items')).toBeNull();
+        });
 
         await user.click(screen.getByText('local (local)'));
         await user.type(screen.getByLabelText('Keyspace Name'), 'some-keyspace');
@@ -105,41 +119,4 @@ describe('CreateKeyspace', () => {
         expect(Snackbar.success).toHaveBeenCalledTimes(1);
         expect(Snackbar.success).toHaveBeenCalledWith('Created keyspace some-keyspace', { autoClose: 1600 });
     });
-
-    // describe('preflight validation', () => {
-    //     it('disables form submission if cluster missing', () => {});
-    //     it('disables form submission if keyspace name missing', () => {});
-    // });
-
-    // describe('error handling', () => {
-    //     it('displays the error message', () => {});
-    // });
 });
-
-const renderHelper = (): { history: MemoryHistory } => {
-    const history = createMemoryHistory();
-    jest.spyOn(history, 'push');
-
-    const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false } },
-    });
-
-    render(
-        <Router history={history}>
-            <QueryClientProvider client={queryClient}>
-                <CreateKeyspace />
-            </QueryClientProvider>
-        </Router>
-    );
-
-    return { history };
-};
-
-/**
- * waitForFormReady waits until all of the initial queries that populate
- * the form (e.g., the list of clusters) have completed.
- */
-const waitForFormReady = () =>
-    waitFor(() => {
-        expect(screen.queryByText('No items')).toBeNull();
-    });
