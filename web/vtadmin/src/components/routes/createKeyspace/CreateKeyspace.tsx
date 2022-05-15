@@ -28,6 +28,7 @@ import { WorkspaceTitle } from '../../layout/WorkspaceTitle';
 import { TextInput } from '../../TextInput';
 import { success } from '../../Snackbar';
 import { Icon, Icons } from '../../Icon';
+import { FormError } from '../../forms/FormError';
 
 interface FormData {
     clusterID: string;
@@ -107,13 +108,10 @@ export const CreateKeyspace = () => {
                     />
 
                     {clustersQuery.isError && (
-                        <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
-                            <div className="text-md font-bold mb-4">
-                                <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} />{' '}
-                                Couldn't load clusters. Please try again.
-                            </div>
-                            <div className="font-mono">{clustersQuery.error?.message}</div>
-                        </div>
+                        <FormError
+                            error={clustersQuery.error}
+                            title="Couldn't load clusters. Please reload the page to try again."
+                        />
                     )}
 
                     <Label className="block my-8" label="Keyspace Name">
@@ -135,13 +133,7 @@ export const CreateKeyspace = () => {
                     </details>
 
                     {mutation.isError && !mutation.isLoading && (
-                        <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
-                            <div className="text-md font-bold mb-4">
-                                <Icon className="inline fill-red-600 h-[20px] align-text-top" icon={Icons.alertFail} />{' '}
-                                Couldn't create keyspace. Please reload the page to try again.
-                            </div>
-                            <div className="font-mono">{mutation.error?.message}</div>
-                        </div>
+                        <FormError error={mutation.error} title="Couldn't create keyspace. Please try again." />
                     )}
 
                     <div className="my-12">
