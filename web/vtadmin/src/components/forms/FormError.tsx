@@ -17,8 +17,8 @@
 import { Icon, Icons } from '../Icon';
 
 interface Props {
-    title?: string | null | undefined;
-    error?: Error | null | undefined;
+    title: string | null | undefined;
+    error: Error | null | undefined;
 }
 
 export const FormError: React.FC<Props> = ({ error, title }) => {
