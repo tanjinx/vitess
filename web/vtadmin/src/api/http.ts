@@ -205,8 +205,6 @@ export const createKeyspace = async (params: CreateKeyspaceParams) => {
         method: 'post',
     });
 
-    console.log(result);
-
     const err = pb.CreateKeyspaceResponse.verify(result);
     if (err) throw Error(err);
 
