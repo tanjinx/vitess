@@ -27,7 +27,6 @@ import { WorkspaceHeader } from '../../layout/WorkspaceHeader';
 import { WorkspaceTitle } from '../../layout/WorkspaceTitle';
 import { TextInput } from '../../TextInput';
 import { success } from '../../Snackbar';
-import { Icon, Icons } from '../../Icon';
 import { FormError } from '../../forms/FormError';
 
 interface FormData {

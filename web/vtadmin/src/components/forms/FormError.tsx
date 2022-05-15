@@ -21,9 +21,6 @@ interface Props {
     error?: Error | null | undefined;
 }
 
-/**
- * FormError is used to display form-level (rather than input-level) errors.
- */
 export const FormError: React.FC<Props> = ({ error, title }) => {
     return (
         <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
