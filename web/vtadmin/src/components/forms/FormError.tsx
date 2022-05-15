@@ -18,14 +18,13 @@ import { Icon, Icons } from '../Icon';
 
 interface Props {
     title?: string | null | undefined;
-    description?: string | null | undefined;
     error?: Error | null | undefined;
 }
 
 /**
  * FormError is used to display form-level (rather than input-level) errors.
  */
-export const FormError: React.FC<Props> = ({ description, error, title }) => {
+export const FormError: React.FC<Props> = ({ error, title }) => {
     return (
         <div className="border border-red-400 bg-red-50 p-6 rounded-md my-12" role="alert">
             <div className="text-md font-bold mb-4">
