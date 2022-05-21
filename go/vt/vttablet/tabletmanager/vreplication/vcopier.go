@@ -260,6 +260,9 @@ func (vc *vcopier) copyTable(ctx context.Context, tableName string, copyState ma
 			buf.Myprintf("update _vt.copy_state set lastpk=%a where vrepl_id=%s and table_name=%s", ":lastpk", strconv.Itoa(int(vc.vr.id)), encodeString(tableName))
 			updateCopyState = buf.ParsedQuery()
 		}
+
+		log.V(3).Infof("Rows: %d, pk: %v", len(rows.Rows), rows.Lastpk)
+
 		if len(rows.Rows) == 0 {
 			return nil
 		}

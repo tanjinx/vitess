@@ -295,6 +295,7 @@ func (rs *rowStreamer) streamQuery(conn *snapshotConn, send func(*binlogdatapb.V
 			rs.vse.rowStreamerNumPackets.Add(int64(1))
 
 			startSend := time.Now()
+			log.V(3).Infof("Rows: %v, pk: %v\n", len(response.Rows), response.Lastpk)
 			err = send(&response)
 			if err != nil {
 				log.Infof("Rowstreamer send returned error %v", err)
