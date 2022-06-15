@@ -69,17 +69,18 @@ var (
 	deprecatedFoundRowsPoolSize             int
 
 	// The following vars are used for custom initialization of Tabletconfig.
-	enableHotRowProtection       bool
-	enableHotRowProtectionDryRun bool
-	enableConsolidator           bool
-	enableConsolidatorReplicas   bool
-	enableHeartbeat              bool
-	heartbeatInterval            time.Duration
-	healthCheckInterval          time.Duration
-	degradedThreshold            time.Duration
-	unhealthyThreshold           time.Duration
-	transitionGracePeriod        time.Duration
-	enableReplicationReporter    bool
+	enableHotRowProtection         bool
+	enableHotRowProtectionDryRun   bool
+	enableConsolidator             bool
+	enableConsolidatorReplicas     bool
+	enableHeartbeat                bool
+	heartbeatInterval              time.Duration
+	healthCheckInterval            time.Duration
+	replicationHealthCheckInterval time.Duration
+	degradedThreshold              time.Duration
+	unhealthyThreshold             time.Duration
+	transitionGracePeriod          time.Duration
+	enableReplicationReporter      bool
 )
 
 func init() {
@@ -156,6 +157,7 @@ func init() {
 	flagutil.DualFormatBoolVar(&currentConfig.CacheResultFields, "enable_query_plan_field_caching", defaultConfig.CacheResultFields, "This option fetches & caches fields (columns) when storing query plans")
 
 	flag.DurationVar(&healthCheckInterval, "health_check_interval", 20*time.Second, "Interval between health checks")
+	flag.DurationVar(&replicationHealthCheckInterval, "replication_health_check_interval", 20*time.Second, "Interval at which ReplicationManager checks replication health")
 	flag.DurationVar(&degradedThreshold, "degraded_threshold", 30*time.Second, "replication lag after which a replica is considered degraded")
 	flag.DurationVar(&unhealthyThreshold, "unhealthy_threshold", 2*time.Hour, "replication lag after which a replica is considered unhealthy")
 	flag.DurationVar(&transitionGracePeriod, "serving_state_grace_period", 0, "how long to pause after broadcasting health to vtgate, before enforcing a new serving state")
@@ -207,6 +209,7 @@ func Init() {
 	}
 
 	currentConfig.Healthcheck.IntervalSeconds.Set(healthCheckInterval)
+	currentConfig.Healthcheck.ReplicationIntervalSeconds.Set(replicationHealthCheckInterval)
 	currentConfig.Healthcheck.DegradedThresholdSeconds.Set(degradedThreshold)
 	currentConfig.Healthcheck.UnhealthyThresholdSeconds.Set(unhealthyThreshold)
 	currentConfig.GracePeriods.TransitionSeconds.Set(transitionGracePeriod)
@@ -309,9 +312,10 @@ type HotRowProtectionConfig struct {
 
 // HealthcheckConfig contains the config for healthcheck.
 type HealthcheckConfig struct {
-	IntervalSeconds           Seconds `json:"intervalSeconds,omitempty"`
-	DegradedThresholdSeconds  Seconds `json:"degradedThresholdSeconds,omitempty"`
-	UnhealthyThresholdSeconds Seconds `json:"unhealthyThresholdSeconds,omitempty"`
+	IntervalSeconds            Seconds `json:"intervalSeconds,omitempty"`
+	ReplicationIntervalSeconds Seconds `json:"replicationIntervalSeconds,omitempty"`
+	DegradedThresholdSeconds   Seconds `json:"degradedThresholdSeconds,omitempty"`
+	UnhealthyThresholdSeconds  Seconds `json:"unhealthyThresholdSeconds,omitempty"`
 }
 
 // GracePeriodsConfig contains various grace periods.
@@ -433,9 +437,10 @@ var defaultConfig = TabletConfig{
 		MaxRows:             10000,
 	},
 	Healthcheck: HealthcheckConfig{
-		IntervalSeconds:           20,
-		DegradedThresholdSeconds:  30,
-		UnhealthyThresholdSeconds: 7200,
+		IntervalSeconds:            20,
+		ReplicationIntervalSeconds: 20,
+		DegradedThresholdSeconds:   30,
+		UnhealthyThresholdSeconds:  7200,
 	},
 	ReplicationTracker: ReplicationTrackerConfig{
 		Mode:                     Disable,

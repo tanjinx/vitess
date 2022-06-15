@@ -117,6 +117,7 @@ gracePeriods: {}
 healthcheck:
   degradedThresholdSeconds: 30
   intervalSeconds: 20
+  replicationIntervalSeconds: 20
   unhealthyThresholdSeconds: 7200
 hotRowProtection:
   maxConcurrency: 5
@@ -226,6 +227,7 @@ func TestFlags(t *testing.T) {
 	want.HotRowProtection.Mode = Disable
 	want.Consolidator = Enable
 	want.Healthcheck.IntervalSeconds = 20
+	want.Healthcheck.ReplicationIntervalSeconds = 20
 	want.Healthcheck.DegradedThresholdSeconds = 30
 	want.Healthcheck.UnhealthyThresholdSeconds = 7200
 	want.ReplicationTracker.HeartbeatIntervalSeconds = 1
@@ -309,9 +311,12 @@ func TestFlags(t *testing.T) {
 	assert.Equal(t, want, currentConfig)
 
 	healthCheckInterval = 1 * time.Second
+	replicationHealthCheckInterval = 2 * time.Second
 	currentConfig.Healthcheck.IntervalSeconds = 0
+	currentConfig.Healthcheck.ReplicationIntervalSeconds = 0
 	Init()
 	want.Healthcheck.IntervalSeconds = 1
+	want.Healthcheck.ReplicationIntervalSeconds = 2
 	assert.Equal(t, want, currentConfig)
 
 	degradedThreshold = 2 * time.Second

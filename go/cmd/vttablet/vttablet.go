@@ -106,7 +106,7 @@ func main() {
 		VREngine:            vreplication.NewEngine(config, ts, tabletAlias.Cell, mysqld, qsc.LagThrottler()),
 		MetadataManager:     &mysqlctl.MetadataManager{},
 	}
-	if err := tm.Start(tablet, config.Healthcheck.IntervalSeconds.Get()); err != nil {
+	if err := tm.Start(tablet, config.Healthcheck.ReplicationIntervalSeconds.Get()); err != nil {
 		log.Exitf("failed to parse -tablet-path or initialize DB credentials: %v", err)
 	}
 	servenv.OnClose(func() {
