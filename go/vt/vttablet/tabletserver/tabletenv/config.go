@@ -40,6 +40,8 @@ const (
 	NotOnMaster = "notOnMaster"
 	Polling     = "polling"
 	Heartbeat   = "heartbeat"
+
+	ReplicationHealthCheckIntervalSecondsFlagName = "replication_health_check_interval"
 )
 
 var (
@@ -157,7 +159,7 @@ func init() {
 	flagutil.DualFormatBoolVar(&currentConfig.CacheResultFields, "enable_query_plan_field_caching", defaultConfig.CacheResultFields, "This option fetches & caches fields (columns) when storing query plans")
 
 	flag.DurationVar(&healthCheckInterval, "health_check_interval", 20*time.Second, "Interval between health checks")
-	flag.DurationVar(&replicationHealthCheckInterval, "replication_health_check_interval", 20*time.Second, "Interval at which ReplicationManager checks replication health")
+	flag.DurationVar(&replicationHealthCheckInterval, ReplicationHealthCheckIntervalSecondsFlagName, 20*time.Second, "Interval at which ReplicationManager checks replication health")
 	flag.DurationVar(&degradedThreshold, "degraded_threshold", 30*time.Second, "replication lag after which a replica is considered degraded")
 	flag.DurationVar(&unhealthyThreshold, "unhealthy_threshold", 2*time.Hour, "replication lag after which a replica is considered unhealthy")
 	flag.DurationVar(&transitionGracePeriod, "serving_state_grace_period", 0, "how long to pause after broadcasting health to vtgate, before enforcing a new serving state")
@@ -209,7 +211,13 @@ func Init() {
 	}
 
 	currentConfig.Healthcheck.IntervalSeconds.Set(healthCheckInterval)
-	currentConfig.Healthcheck.ReplicationIntervalSeconds.Set(replicationHealthCheckInterval)
+
+	var actualReplHealthCheckInterval = healthCheckInterval
+	if flagWasPassed(ReplicationHealthCheckIntervalSecondsFlagName) {
+		actualReplHealthCheckInterval = replicationHealthCheckInterval
+	}
+	currentConfig.Healthcheck.ReplicationIntervalSeconds.Set(actualReplHealthCheckInterval)
+
 	currentConfig.Healthcheck.DegradedThresholdSeconds.Set(degradedThreshold)
 	currentConfig.Healthcheck.UnhealthyThresholdSeconds.Set(unhealthyThreshold)
 	currentConfig.GracePeriods.TransitionSeconds.Set(transitionGracePeriod)
@@ -512,4 +520,14 @@ func defaultTransactionLimitConfig() TransactionLimitConfig {
 		TransactionLimitByComponent:    false,
 		TransactionLimitBySubcomponent: false,
 	}
+}
+
+func flagWasPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
 }

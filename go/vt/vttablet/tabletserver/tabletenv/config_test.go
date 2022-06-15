@@ -316,7 +316,7 @@ func TestFlags(t *testing.T) {
 	currentConfig.Healthcheck.ReplicationIntervalSeconds = 0
 	Init()
 	want.Healthcheck.IntervalSeconds = 1
-	want.Healthcheck.ReplicationIntervalSeconds = 2
+	want.Healthcheck.ReplicationIntervalSeconds = 1
 	assert.Equal(t, want, currentConfig)
 
 	degradedThreshold = 2 * time.Second
