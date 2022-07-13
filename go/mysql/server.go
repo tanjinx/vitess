@@ -289,18 +289,18 @@ func (l *Listener) Accept() {
 }
 
 type handleTimings struct {
-	accept time.Time
-	handleStart time.Duration
-	handlerDone time.Duration
+	accept        time.Time
+	handleStart   time.Duration
+	handlerDone   time.Duration
 	handshakeSent time.Duration
-	packetRead time.Duration
+	packetRead    time.Duration
 }
 
 // handle is called in a go routine for each client connection.
 // FIXME(alainjobart) handle per-connection logs in a way that makes sense.
 func (l *Listener) handle(conn net.Conn, connectionID uint32, acceptTime time.Time) {
-	timings := handleTimings{accept: acceptTime}
-	handleStart := time.Now() - acceptTime
+	cnxnTimings := handleTimings{accept: acceptTime}
+	cnxnTimings.handleStart = time.Since(acceptTime)
 	if l.connReadTimeout != 0 || l.connWriteTimeout != 0 {
 		conn = netutil.NewConnWithTimeouts(conn, l.connReadTimeout, l.connWriteTimeout)
 	}
@@ -323,7 +323,7 @@ func (l *Listener) handle(conn net.Conn, connectionID uint32, acceptTime time.Ti
 	l.handler.NewConnection(c)
 	defer l.handler.ConnectionClosed(c)
 
-	timings.handlerDone = time.Now() - acceptTime
+	cnxnTimings.handlerDone = time.Since(acceptTime)
 
 	// Adjust the count of open connections
 	defer connCount.Add(-1)
@@ -337,7 +337,7 @@ func (l *Listener) handle(conn net.Conn, connectionID uint32, acceptTime time.Ti
 		return
 	}
 
-	timings.handshakeSent = time.Now() - acceptTime
+	cnxnTimings.handshakeSent = time.Since(acceptTime)
 
 	// Wait for the client response. This has to be a direct read,
 	// so we don't buffer the TLS negotiation packets.
@@ -350,10 +350,10 @@ func (l *Listener) handle(conn net.Conn, connectionID uint32, acceptTime time.Ti
 		return
 	}
 
-	timings.packetRead = time.Now() - acceptTime
+	cnxnTimings.packetRead = time.Since(acceptTime)
 
-	if timings.packetRead > time.Milliseconds * 10 {
-		log.Warningf("Slow connection setup %s: %+v", c, timings)
+	if cnxnTimings.packetRead > time.Millisecond*10 {
+		log.Warningf("Slow connection setup %s: %+v", c, cnxnTimings)
 	}
 
 	user, authMethod, authResponse, err := l.parseClientHandshakePacket(c, true, response)
